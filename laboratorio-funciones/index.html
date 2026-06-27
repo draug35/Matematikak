@@ -1,0 +1,190 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Laboratorio visual de funciones</title>
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%231b6f8f'/%3E%3Cpath d='M5 22 C10 4 15 28 27 10' fill='none' stroke='white' stroke-width='3' stroke-linecap='round'/%3E%3C/svg%3E">
+    <link rel="stylesheet" href="styles.css">
+  </head>
+  <body>
+    <header class="topbar">
+      <div>
+        <h1 data-i18n="appTitle">Laboratorio visual de funciones</h1>
+        <p data-i18n="appSubtitle">Análisis guiado para 2º de Bachillerato</p>
+      </div>
+      <p class="topbar-note" data-i18n="topbarNote">Dominio, derivada, curvatura, tangente e integral en una misma lectura.</p>
+      <div class="language-control">
+        <label for="languageSelect" data-i18n="languageLabel">Idioma</label>
+        <select id="languageSelect">
+          <option value="es">Castellano</option>
+          <option value="eu">Euskara</option>
+        </select>
+      </div>
+    </header>
+
+    <main class="app-shell">
+      <section class="panel controls" aria-label="Controles del laboratorio">
+        <div class="control-block">
+          <label for="caseSelect" data-i18n="caseStudy">Caso de estudio</label>
+          <select id="caseSelect"></select>
+        </div>
+
+        <div class="case-purpose">
+          <h2 id="caseName">Caso</h2>
+          <p id="caseFocus"></p>
+        </div>
+
+        <div class="control-block">
+          <span class="label" data-i18n="layers">Capas matemáticas</span>
+          <label class="toggle">
+            <input type="checkbox" id="showF" checked>
+            <span>f(x)</span>
+          </label>
+          <label class="toggle">
+            <input type="checkbox" id="showD1" checked>
+            <span>f'(x)</span>
+          </label>
+          <label class="toggle">
+            <input type="checkbox" id="showD2">
+            <span>f''(x)</span>
+          </label>
+          <label class="toggle">
+            <input type="checkbox" id="showTangent" checked>
+            <span data-i18n="tangentLayer">tangente</span>
+          </label>
+          <label class="toggle">
+            <input type="checkbox" id="showArea">
+            <span data-i18n="integralLayer">integral</span>
+          </label>
+          <label class="toggle">
+            <input type="checkbox" id="showPoints" checked>
+            <span data-i18n="keyPointsLayer">puntos clave</span>
+          </label>
+        </div>
+
+        <div class="control-block">
+          <label for="xPoint"><span data-i18n="localReadingInline">Lectura local</span> x = <strong id="xPointLabel">0</strong></label>
+          <input type="range" id="xPoint" step="0.01">
+          <input type="number" id="xPointNumber" step="0.01" inputmode="decimal">
+        </div>
+
+        <div class="control-block interval-controls">
+          <span class="label" data-i18n="interval">Intervalo [a, b]</span>
+          <label for="intervalA">a</label>
+          <input type="number" id="intervalA" step="0.1" inputmode="decimal">
+          <label for="intervalB">b</label>
+          <input type="number" id="intervalB" step="0.1" inputmode="decimal">
+        </div>
+
+        <button id="resetCase" class="secondary-button" type="button" data-i18n="resetCase">Restablecer caso</button>
+      </section>
+
+      <section class="workspace" aria-label="Espacio de análisis">
+        <section class="graph-panel" aria-label="Gráfica de la función">
+          <div class="graph-header">
+            <div>
+              <h2 id="graphTitle"></h2>
+              <p id="formulaLine" class="formula"></p>
+            </div>
+            <div class="legend" aria-label="Leyenda">
+              <span><i class="swatch swatch-f"></i>f</span>
+              <span><i class="swatch swatch-d1"></i>f'</span>
+              <span><i class="swatch swatch-d2"></i>f''</span>
+              <span><i class="swatch swatch-tangent"></i><span data-i18n="tangentLayer">tangente</span></span>
+            </div>
+          </div>
+
+          <svg id="plot" role="img" aria-label="Representación gráfica del caso seleccionado"></svg>
+          <p id="domainWarning" class="notice" hidden></p>
+        </section>
+
+        <section class="analysis-grid" aria-label="Lectura matemática">
+          <article class="panel value-panel">
+            <h2 data-i18n="localReading">Lectura local</h2>
+            <dl class="value-list">
+              <div>
+                <dt>f(x)</dt>
+                <dd id="valueF">-</dd>
+              </div>
+              <div>
+                <dt>f'(x)</dt>
+                <dd id="valueD1">-</dd>
+              </div>
+              <div>
+                <dt>f''(x)</dt>
+                <dd id="valueD2">-</dd>
+              </div>
+            </dl>
+            <p id="localInterpretation" class="interpretation"></p>
+            <table class="local-table">
+              <caption data-i18n="localTableCaption">Tabla alrededor del punto</caption>
+              <thead>
+                <tr>
+                  <th>x</th>
+                  <th>f(x)</th>
+                </tr>
+              </thead>
+              <tbody id="localTable"></tbody>
+            </table>
+          </article>
+
+          <article class="panel report-panel">
+            <h2 data-i18n="dynamicReportTitle">Informe dinámico</h2>
+            <p id="dynamicReport"></p>
+            <p id="integralReport" class="integral-report"></p>
+          </article>
+        </section>
+
+        <section class="panel quiz-panel" aria-label="Cuestionario adaptado">
+          <div class="quiz-header">
+            <div>
+              <h2 id="quizTitle">Cuestionario adaptado</h2>
+              <p id="quizIntro"></p>
+            </div>
+            <p id="quizProgress" class="quiz-progress"></p>
+          </div>
+
+          <div class="quiz-body">
+            <p id="quizQuestion" class="quiz-question"></p>
+            <fieldset id="quizOptions" class="quiz-options"></fieldset>
+          </div>
+
+          <div class="quiz-actions">
+            <button id="hintButton" class="secondary-button compact-button" type="button">Pista</button>
+            <button id="checkAnswer" class="primary-button compact-button" type="button">Corregir</button>
+            <button id="nextQuestion" class="secondary-button compact-button" type="button">Siguiente</button>
+            <button id="restartQuiz" class="secondary-button compact-button" type="button">Reiniciar</button>
+          </div>
+
+          <div id="quizFeedback" class="quiz-feedback" hidden></div>
+
+          <label class="reflection-label" for="reflectionText" id="reflectionLabel">Antes de cerrar, escribe una frase matemática que justifique tu respuesta.</label>
+          <textarea id="reflectionText" rows="3"></textarea>
+        </section>
+      </section>
+
+      <aside class="panel guide" aria-label="Guía de trabajo">
+        <h2 data-i18n="analysisGuide">Guía de análisis</h2>
+        <p id="domainText" class="domain-text"></p>
+
+        <ol id="taskList" class="task-list"></ol>
+
+        <div class="guide-section">
+          <h3 data-i18n="errorsTitle">Errores a vigilar</h3>
+          <ul id="errorList"></ul>
+        </div>
+
+        <div class="guide-section">
+          <h3 data-i18n="criteriaTitle">Criterios de éxito</h3>
+          <ul id="criteriaList"></ul>
+        </div>
+
+        <button id="solutionToggle" class="primary-button" type="button">Mostrar solución orientativa</button>
+        <div id="solutionPanel" class="solution-panel" hidden></div>
+      </aside>
+    </main>
+
+    <script src="app.js" defer></script>
+  </body>
+</html>
