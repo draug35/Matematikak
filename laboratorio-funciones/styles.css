@@ -123,7 +123,8 @@ textarea {
 .case-purpose h2,
 .guide h2,
 .value-panel h2,
-.report-panel h2 {
+.report-panel h2,
+.guided-header h2 {
   margin: 0;
   font-size: 1rem;
   line-height: 1.25;
@@ -297,6 +298,7 @@ input[type="range"] {
 
 .value-panel,
 .report-panel,
+.guided-panel,
 .quiz-panel {
   padding: 16px;
 }
@@ -533,6 +535,179 @@ input[type="range"] {
   line-height: 1.45;
 }
 
+.guided-panel {
+  display: grid;
+  gap: 14px;
+}
+
+.guided-header,
+.guided-summary-header {
+  display: flex;
+  justify-content: space-between;
+  gap: 18px;
+  align-items: start;
+}
+
+.guided-header p,
+.guided-summary-header p {
+  margin: 6px 0 0;
+  color: var(--muted);
+  line-height: 1.45;
+}
+
+.guided-progress {
+  min-width: 128px;
+  text-align: right;
+  font-weight: 800;
+  color: var(--accent-dark);
+}
+
+.guided-steps-nav {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: 6px;
+}
+
+.guided-step-button {
+  min-height: 42px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: #fff;
+  color: var(--ink);
+  cursor: pointer;
+  font-size: 0.82rem;
+  font-weight: 800;
+  line-height: 1.15;
+  padding: 7px;
+}
+
+.guided-step-button.active {
+  border-color: var(--accent);
+  background: var(--surface-2);
+  color: var(--accent-dark);
+}
+
+.guided-step-button.done::after {
+  content: "";
+  display: block;
+  width: 22px;
+  height: 3px;
+  margin: 6px auto 0;
+  border-radius: 4px;
+  background: var(--accent);
+}
+
+.guided-step-card {
+  display: grid;
+  gap: 10px;
+  padding: 14px;
+  border: 1px solid var(--soft-border);
+  border-radius: 6px;
+  background: #fbfcfd;
+}
+
+.guided-step-tag,
+.guided-checklist-title {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.82rem;
+  font-weight: 850;
+}
+
+.guided-step-card h3 {
+  margin: 0;
+  font-size: 1rem;
+  line-height: 1.25;
+}
+
+#guidedStepPrompt {
+  margin: 0;
+  line-height: 1.5;
+}
+
+.guided-support {
+  margin: 0;
+  padding-left: 20px;
+  color: var(--muted);
+}
+
+.guided-support li {
+  margin: 5px 0;
+  line-height: 1.4;
+}
+
+.guided-response-label {
+  margin-top: 4px;
+}
+
+#guidedResponse,
+#guidedSummaryText {
+  width: 100%;
+  resize: vertical;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 9px;
+  line-height: 1.45;
+}
+
+#guidedResponse {
+  min-height: 104px;
+}
+
+#guidedSummaryText {
+  min-height: 220px;
+  background: #fff;
+}
+
+.guided-checklist-wrap {
+  display: grid;
+  gap: 8px;
+  padding-top: 4px;
+}
+
+.guided-checklist {
+  display: grid;
+  gap: 7px;
+}
+
+.guided-check {
+  display: grid;
+  grid-template-columns: 20px minmax(0, 1fr);
+  gap: 8px;
+  align-items: start;
+  line-height: 1.35;
+  font-weight: 600;
+}
+
+.guided-check input {
+  margin-top: 2px;
+  accent-color: var(--accent);
+}
+
+.guided-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.guided-summary {
+  display: grid;
+  gap: 12px;
+  padding: 14px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--surface-2);
+}
+
+.guided-summary[hidden] {
+  display: none;
+}
+
+.guided-summary h3 {
+  margin: 0;
+  font-size: 1rem;
+}
+
 .axis {
   stroke: #2e3b42;
   stroke-width: 1.2;
@@ -659,6 +834,19 @@ input[type="range"] {
     display: grid;
   }
 
+  .guided-header,
+  .guided-summary-header {
+    display: grid;
+  }
+
+  .guided-steps-nav {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .guided-progress {
+    text-align: left;
+  }
+
   .quiz-progress {
     text-align: left;
   }
@@ -678,15 +866,21 @@ input[type="range"] {
   .graph-panel,
   .value-panel,
   .report-panel,
+  .guided-panel,
   .quiz-panel {
     padding: 12px;
   }
 
-  .quiz-actions {
+  .quiz-actions,
+  .guided-actions {
     display: grid;
   }
 
   .compact-button {
     width: 100%;
+  }
+
+  .guided-steps-nav {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }

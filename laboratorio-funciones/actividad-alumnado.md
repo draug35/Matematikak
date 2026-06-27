@@ -15,6 +15,15 @@ Para el caso asignado, escribe:
 
 ## Durante el laboratorio
 
+Sigue el ciclo guiado de la herramienta:
+
+1. **Predigo:** escribe dominio, puntos importantes y una conjetura.
+2. **Observo:** activa capas y contrasta tu predicción.
+3. **Respondo:** contesta el cuestionario y justifica tu opción.
+4. **Corrijo:** lee la retroalimentación y explica qué cambia en tu razonamiento.
+5. **Justifico:** redacta una conclusión matemática breve.
+6. **Transfiero:** plantea una situación parecida o una pregunta espejo.
+
 Completa esta tabla con tres valores de \(x\):
 
 | x | f(x) | f'(x) | f''(x) | Interpretación |

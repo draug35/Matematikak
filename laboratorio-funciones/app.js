@@ -13,6 +13,11 @@ const domainWarning = document.querySelector("#domainWarning");
 const quizOptions = document.querySelector("#quizOptions");
 const quizFeedback = document.querySelector("#quizFeedback");
 const reflectionText = document.querySelector("#reflectionText");
+const guidedStepsNav = document.querySelector("#guidedStepsNav");
+const guidedResponse = document.querySelector("#guidedResponse");
+const guidedChecklist = document.querySelector("#guidedChecklist");
+const guidedSummary = document.querySelector("#guidedSummary");
+const guidedSummaryText = document.querySelector("#guidedSummaryText");
 
 const controls = {
   showF: document.querySelector("#showF"),
@@ -254,7 +259,10 @@ let state = {
   selectedAnswer: null,
   quizFeedback: null,
   quizHintShown: false,
-  quizCorrect: {}
+  quizCorrect: {},
+  guidedStep: 0,
+  guidedWork: {},
+  guidedSummaryVisible: false
 };
 
 const uiText = {
@@ -293,6 +301,27 @@ const uiText = {
     review: "Revisa.",
     thinkNow: "Qué pensar ahora:",
     reflectionLabel: "Antes de cerrar, escribe una frase matemática que justifique tu respuesta.",
+    guidedTitle: "Ciclo guiado de aprendizaje",
+    guidedIntro: "Sigue los pasos en orden: primero piensa, después observa y finalmente justifica.",
+    guidedStep: "Paso",
+    guidedResponseLabel: "Respuesta del alumno",
+    guidedChecklistTitle: "Antes de avanzar, comprueba",
+    guidedPrev: "Anterior",
+    guidedNext: "Siguiente",
+    guidedClearStep: "Limpiar paso",
+    guidedBuildSummary: "Preparar informe",
+    guidedCopySummary: "Copiar",
+    guidedCopied: "Copiado",
+    guidedSummaryTitle: "Informe del ciclo",
+    guidedSummaryIntro: "Resumen editable para revisar, copiar o entregar.",
+    guidedEmpty: "Sin respuesta todavía.",
+    guidedChecklistDone: "Comprobaciones marcadas",
+    guidedReportCase: "Caso",
+    guidedReportFormula: "Función",
+    guidedQuizStatus: "Cuestionario",
+    guidedQuizNoData: "sin corregir todavía",
+    guidedQuizCorrect: "última corrección registrada como correcta",
+    guidedQuizWrong: "última corrección registrada como revisable",
     criteria: [
       "Explicita el dominio antes de interpretar la gráfica.",
       "Relaciona el signo de f' con intervalos de crecimiento o decrecimiento.",
@@ -343,6 +372,27 @@ const uiText = {
     review: "Berrikusi.",
     thinkNow: "Orain pentsatu beharrekoa:",
     reflectionLabel: "Amaitu aurretik, idatzi zure erantzuna justifikatzen duen esaldi matematiko bat.",
+    guidedTitle: "Ikaskuntza-ziklo gidatua",
+    guidedIntro: "Jarraitu urratsak ordenean: lehenik pentsatu, gero behatu eta amaieran justifikatu.",
+    guidedStep: "Urratsa",
+    guidedResponseLabel: "Ikaslearen erantzuna",
+    guidedChecklistTitle: "Aurrera egin aurretik, egiaztatu",
+    guidedPrev: "Aurrekoa",
+    guidedNext: "Hurrengoa",
+    guidedClearStep: "Garbitu urratsa",
+    guidedBuildSummary: "Prestatu txostena",
+    guidedCopySummary: "Kopiatu",
+    guidedCopied: "Kopiatuta",
+    guidedSummaryTitle: "Zikloaren txostena",
+    guidedSummaryIntro: "Berrikusteko, kopiatzeko edo entregatzeko laburpen editagarria.",
+    guidedEmpty: "Oraindik erantzunik ez.",
+    guidedChecklistDone: "Markatutako egiaztapenak",
+    guidedReportCase: "Kasua",
+    guidedReportFormula: "Funtzioa",
+    guidedQuizStatus: "Galdetegia",
+    guidedQuizNoData: "oraindik zuzendu gabe",
+    guidedQuizCorrect: "azken zuzenketa zuzentzat erregistratu da",
+    guidedQuizWrong: "azken zuzenketa berrikustekotzat erregistratu da",
     criteria: [
       "Domeinua esplizitatu grafikoa interpretatu aurretik.",
       "Lotu f'-ren zeinua hazkunde- edo beherakada-tarteekin.",
@@ -688,6 +738,111 @@ const quizzes = {
     }
   ]
 };
+
+const guidedSteps = [
+  {
+    id: "predict",
+    title: { es: "Predigo", eu: "Aurreikusten dut" },
+    prompt: {
+      es: "Antes de usar la gráfica como prueba, escribe qué esperas que ocurra con el dominio, los puntos problemáticos y el comportamiento de la función.",
+      eu: "Grafikoa froga gisa erabili aurretik, idatzi zer espero duzun domeinuaz, puntu problematikoez eta funtzioaren portaeraz."
+    },
+    support: [
+      { es: "Empieza por el dominio: ¿hay denominadores, raíces, logaritmos o tramos?", eu: "Hasi domeinutik: izendatzailerik, errorik, logaritmorik edo zatirik ba al dago?" },
+      { es: "Haz una conjetura: crecimiento, extremos, asíntotas, curvatura o no derivabilidad.", eu: "Egin aieru bat: hazkundea, muturrak, asintotak, kurbadura edo ez-deribagarritasuna." }
+    ],
+    checks: [
+      { es: "He escrito el dominio antes de interpretar la gráfica.", eu: "Domeinua idatzi dut grafikoa interpretatu aurretik." },
+      { es: "He señalado al menos un punto o intervalo importante.", eu: "Gutxienez puntu edo tarte garrantzitsu bat adierazi dut." },
+      { es: "He formulado una predicción que se puede comprobar.", eu: "Egiazta daitekeen aurreikuspen bat egin dut." }
+    ]
+  },
+  {
+    id: "observe",
+    title: { es: "Observo", eu: "Behatu egiten dut" },
+    prompt: {
+      es: "Activa las capas necesarias y contrasta tu predicción. No escribas solo lo que ves: nombra la evidencia matemática.",
+      eu: "Aktibatu behar diren geruzak eta kontrastatu zure aurreikuspena. Ez idatzi bakarrik ikusten duzuna: izendatu ebidentzia matematikoa."
+    },
+    support: [
+      { es: "Compara f con f': el signo de f' explica crecimiento o decrecimiento.", eu: "Konparatu f eta f': f'-ren zeinuak hazkundea edo beherakada azaltzen du." },
+      { es: "Usa f'' solo para curvatura; no la confundas con crecimiento.", eu: "Erabili f'' kurbadurarako bakarrik; ez nahastu hazkundearekin." }
+    ],
+    checks: [
+      { es: "He mirado la gráfica de f y una capa de apoyo.", eu: "f-ren grafikoa eta laguntza-geruza bat begiratu ditut." },
+      { es: "He comprobado si mi predicción inicial se mantiene o debe corregirse.", eu: "Hasierako aurreikuspena mantentzen den edo zuzendu behar den egiaztatu dut." },
+      { es: "He separado intervalos cuando el dominio se rompe.", eu: "Domeinua hausten denean tarteak bereizi ditut." }
+    ]
+  },
+  {
+    id: "answer",
+    title: { es: "Respondo", eu: "Erantzuten dut" },
+    prompt: {
+      es: "Responde al cuestionario del caso. Antes de corregir, escribe por qué eliges esa opción y por qué descartas al menos otra.",
+      eu: "Erantzun kasuaren galdetegiari. Zuzendu aurretik, idatzi zergatik aukeratu duzun aukera hori eta zergatik baztertu duzun gutxienez beste bat."
+    },
+    support: [
+      { es: "La respuesta debe apoyarse en dominio, signo de derivada, curvatura o discontinuidad.", eu: "Erantzunak domeinuan, deribatuaren zeinuan, kurbaduran edo etengunean oinarritu behar du." },
+      { es: "Si dudas, vuelve a la guía de análisis del caso.", eu: "Zalantza baduzu, itzuli kasuaren analisi-gidara." }
+    ],
+    checks: [
+      { es: "He respondido el cuestionario adaptado.", eu: "Galdetegi egokitua erantzun dut." },
+      { es: "He justificado mi opción antes de mirar la corrección.", eu: "Aukera justifikatu dut zuzenketa begiratu aurretik." },
+      { es: "He descartado una opción con una razón matemática.", eu: "Aukera bat arrazoi matematiko batekin baztertu dut." }
+    ]
+  },
+  {
+    id: "correct",
+    title: { es: "Corrijo", eu: "Zuzentzen dut" },
+    prompt: {
+      es: "Lee la retroalimentación. Si tu idea inicial era incompleta o falsa, escribe exactamente qué debes cambiar en tu razonamiento.",
+      eu: "Irakurri feedbacka. Zure hasierako ideia osatugabea edo okerra bazen, idatzi zehazki zer aldatu behar duzun arrazoibidean."
+    },
+    support: [
+      { es: "Nombra el error: dominio, f frente a f', curvatura, asíntota, integral o derivabilidad.", eu: "Izendatu akatsa: domeinua, f eta f', kurbadura, asintota, integrala edo deribagarritasuna." },
+      { es: "Corregir no es cambiar la respuesta: es cambiar el motivo.", eu: "Zuzentzea ez da erantzuna aldatzea: arrazoia aldatzea da." }
+    ],
+    checks: [
+      { es: "He leído la pista o la corrección.", eu: "Pista edo zuzenketa irakurri dut." },
+      { es: "He identificado el tipo de error o la idea clave.", eu: "Akats mota edo ideia gakoa identifikatu dut." },
+      { es: "He escrito una versión corregida de mi razonamiento.", eu: "Nire arrazoibidearen bertsio zuzendua idatzi dut." }
+    ]
+  },
+  {
+    id: "justify",
+    title: { es: "Justifico", eu: "Justifikatzen dut" },
+    prompt: {
+      es: "Redacta una conclusión breve y rigurosa. Debe incluir dominio, comportamiento y una evidencia tomada de la herramienta.",
+      eu: "Idatzi ondorio labur eta zorrotz bat. Domeinua, portaera eta tresnatik hartutako ebidentzia bat jaso behar ditu."
+    },
+    support: [
+      { es: "Una buena frase usa conectores: porque, por tanto, sin embargo, en cada rama.", eu: "Esaldi on batek lokailuak erabiltzen ditu: delako, beraz, hala ere, adar bakoitzean." },
+      { es: "Evita 'se ve que...' si no dices qué dato lo justifica.", eu: "Saihestu 'ikusten da...' esatea, justifikatzen duen datua aipatu gabe." }
+    ],
+    checks: [
+      { es: "He mencionado el dominio o sus restricciones.", eu: "Domeinua edo bere murrizketak aipatu ditut." },
+      { es: "He usado f' o f'' con significado, no solo como cálculo.", eu: "f' edo f'' esanahiarekin erabili dut, ez kalkulu huts gisa." },
+      { es: "Mi conclusión se puede leer sin mirar la pantalla.", eu: "Nire ondorioa pantaila begiratu gabe uler daiteke." }
+    ]
+  },
+  {
+    id: "transfer",
+    title: { es: "Transfiero", eu: "Transferitzen dut" },
+    prompt: {
+      es: "Cierra con una transferencia: plantea una función parecida, cambia una condición o escribe qué mirarías primero en un ejercicio nuevo.",
+      eu: "Amaitzeko, transferentzia egin: proposatu antzeko funtzio bat, aldatu baldintza bat edo idatzi ariketa berri batean zer begiratuko zenukeen lehenik."
+    },
+    support: [
+      { es: "La transferencia demuestra que no solo has reconocido este dibujo concreto.", eu: "Transferentziak erakusten du ez duzula marrazki zehatz hau bakarrik ezagutu." },
+      { es: "Puedes proponer una pregunta espejo para otro compañero.", eu: "Beste ikaskide batentzat galdera ispilu bat proposa dezakezu." }
+    ],
+    checks: [
+      { es: "He planteado una situación nueva pero relacionada.", eu: "Egoera berri baina lotu bat planteatu dut." },
+      { es: "He explicado qué concepto se conserva.", eu: "Zein kontzeptu mantentzen den azaldu dut." },
+      { es: "He escrito qué comprobaría primero.", eu: "Lehenik zer egiaztatuko nukeen idatzi dut." }
+    ]
+  }
+];
 
 function el(name, attrs = {}, text = "") {
   const node = document.createElementNS(svgNS, name);
@@ -1211,9 +1366,9 @@ function renderAnalysis() {
   const d1 = evaluate(item.d1, state.x);
   const d2 = evaluate(item.d2, state.x);
 
-  text("#valueF", f === null || !isInDomain(item, state.x) ? "no existe" : formatNumber(f));
-  text("#valueD1", d1 === null || !isInDomain(item, state.x) ? "no existe" : formatNumber(d1));
-  text("#valueD2", d2 === null || !isInDomain(item, state.x) ? "no existe" : formatNumber(d2));
+  text("#valueF", f === null || !isInDomain(item, state.x) ? tr("notExists") : formatNumber(f));
+  text("#valueD1", d1 === null || !isInDomain(item, state.x) ? tr("notExists") : formatNumber(d1));
+  text("#valueD2", d2 === null || !isInDomain(item, state.x) ? tr("notExists") : formatNumber(d2));
   text("#localInterpretation", interpretation(item, state.x));
   text("#dynamicReport", dynamicReport(item));
 
@@ -1386,6 +1541,198 @@ function nextQuizQuestion() {
   renderQuiz();
 }
 
+function guidedStorageKey() {
+  return "laboratorioFunciones.guidedWork.v1";
+}
+
+function loadGuidedWork() {
+  try {
+    const saved = window.localStorage.getItem(guidedStorageKey());
+    state.guidedWork = saved ? JSON.parse(saved) : {};
+  } catch {
+    state.guidedWork = {};
+  }
+}
+
+function saveGuidedWork() {
+  try {
+    window.localStorage.setItem(guidedStorageKey(), JSON.stringify(state.guidedWork));
+  } catch {
+    // El guardado local es una ayuda; la herramienta sigue funcionando sin él.
+  }
+}
+
+function currentGuidedData() {
+  if (!state.guidedWork[state.caseId]) {
+    state.guidedWork[state.caseId] = { answers: {}, checks: {} };
+  }
+  return state.guidedWork[state.caseId];
+}
+
+function currentGuidedStep() {
+  return guidedSteps[state.guidedStep] || guidedSteps[0];
+}
+
+function guidedStepIsDone(step) {
+  const data = currentGuidedData();
+  const answer = data.answers[step.id]?.trim();
+  const checks = data.checks[step.id] || [];
+  return Boolean(answer) || checks.some(Boolean);
+}
+
+function stripHtml(value) {
+  const withPowers = value.replace(/<sup>(.*?)<\/sup>/g, "^$1");
+  const node = document.createElement("div");
+  node.innerHTML = withPowers;
+  return node.textContent || node.innerText || "";
+}
+
+function renderGuidedCycle() {
+  const item = currentCase();
+  const step = currentGuidedStep();
+  const data = currentGuidedData();
+  const answer = data.answers[step.id] || "";
+  const checks = data.checks[step.id] || [];
+
+  text("#guidedTitle", tr("guidedTitle"));
+  text("#guidedIntro", tr("guidedIntro"));
+  text("#guidedProgress", `${tr("guidedStep")} ${state.guidedStep + 1}/${guidedSteps.length}`);
+  text("#guidedStepTag", `${tr("guidedStep")} ${state.guidedStep + 1}`);
+  text("#guidedStepTitle", localized(step.title));
+  text("#guidedStepPrompt", `${localized(step.prompt)} ${caseField(item, "name")}: ${caseField(item, "focus")}`);
+  text("#guidedResponseLabel", tr("guidedResponseLabel"));
+  text("#guidedChecklistTitle", tr("guidedChecklistTitle"));
+  text("#guidedPrev", tr("guidedPrev"));
+  text("#guidedNext", tr("guidedNext"));
+  text("#guidedClearStep", tr("guidedClearStep"));
+  text("#guidedBuildSummary", tr("guidedBuildSummary"));
+  text("#guidedCopySummary", tr("guidedCopySummary"));
+  text("#guidedSummaryTitle", tr("guidedSummaryTitle"));
+  text("#guidedSummaryIntro", tr("guidedSummaryIntro"));
+  guidedResponse.value = answer;
+
+  const supportList = document.querySelector("#guidedSupportList");
+  supportList.innerHTML = "";
+  step.support.forEach(itemText => {
+    const li = document.createElement("li");
+    li.textContent = localized(itemText);
+    supportList.append(li);
+  });
+
+  guidedStepsNav.innerHTML = "";
+  guidedSteps.forEach((entry, index) => {
+    const button = document.createElement("button");
+    button.type = "button";
+    button.className = "guided-step-button";
+    if (index === state.guidedStep) button.classList.add("active");
+    if (guidedStepIsDone(entry)) button.classList.add("done");
+    button.dataset.step = String(index);
+    button.textContent = localized(entry.title);
+    guidedStepsNav.append(button);
+  });
+
+  guidedChecklist.innerHTML = "";
+  step.checks.forEach((check, index) => {
+    const label = document.createElement("label");
+    label.className = "guided-check";
+    const input = document.createElement("input");
+    input.type = "checkbox";
+    input.dataset.check = String(index);
+    input.checked = Boolean(checks[index]);
+    const span = document.createElement("span");
+    span.textContent = localized(check);
+    label.append(input, span);
+    guidedChecklist.append(label);
+  });
+
+  if (state.guidedSummaryVisible) {
+    guidedSummary.hidden = false;
+    guidedSummaryText.value = buildGuidedSummary();
+  } else {
+    guidedSummary.hidden = true;
+  }
+}
+
+function updateGuidedAnswer(value) {
+  const data = currentGuidedData();
+  const step = currentGuidedStep();
+  data.answers[step.id] = value;
+  saveGuidedWork();
+  renderGuidedCycle();
+}
+
+function updateGuidedCheck(index, checked) {
+  const data = currentGuidedData();
+  const step = currentGuidedStep();
+  if (!data.checks[step.id]) data.checks[step.id] = [];
+  data.checks[step.id][index] = checked;
+  saveGuidedWork();
+  renderGuidedCycle();
+}
+
+function setGuidedStep(index) {
+  state.guidedStep = clamp(index, 0, guidedSteps.length - 1);
+  renderGuidedCycle();
+}
+
+function clearGuidedStep() {
+  const data = currentGuidedData();
+  const step = currentGuidedStep();
+  data.answers[step.id] = "";
+  data.checks[step.id] = [];
+  state.guidedSummaryVisible = false;
+  saveGuidedWork();
+  renderGuidedCycle();
+}
+
+function quizStatusForSummary() {
+  const caseKeys = Object.keys(state.quizCorrect).filter(key => key.startsWith(`${state.caseId}:`));
+  if (!caseKeys.length) return tr("guidedQuizNoData");
+  const latestKey = caseKeys[caseKeys.length - 1];
+  return state.quizCorrect[latestKey] ? tr("guidedQuizCorrect") : tr("guidedQuizWrong");
+}
+
+function buildGuidedSummary() {
+  const item = currentCase();
+  const data = currentGuidedData();
+  const lines = [
+    `${tr("guidedSummaryTitle")}`,
+    `${tr("guidedReportCase")}: ${caseField(item, "name")}`,
+    `${tr("guidedReportFormula")}: ${stripHtml(item.formula)}`,
+    `${tr("guidedQuizStatus")}: ${quizStatusForSummary()}`,
+    ""
+  ];
+
+  guidedSteps.forEach((step, index) => {
+    const answer = data.answers[step.id]?.trim() || tr("guidedEmpty");
+    const checked = (data.checks[step.id] || [])
+      .map((isChecked, checkIndex) => isChecked ? localized(step.checks[checkIndex]) : null)
+      .filter(Boolean);
+    lines.push(`${index + 1}. ${localized(step.title)}`);
+    lines.push(answer);
+    if (checked.length) {
+      lines.push(`${tr("guidedChecklistDone")}: ${checked.join(" | ")}`);
+    }
+    lines.push("");
+  });
+
+  return lines.join("\n");
+}
+
+async function copyGuidedSummary() {
+  state.guidedSummaryVisible = true;
+  guidedSummary.hidden = false;
+  guidedSummaryText.value = buildGuidedSummary();
+  try {
+    await navigator.clipboard.writeText(guidedSummaryText.value);
+    text("#guidedCopySummary", tr("guidedCopied"));
+    setTimeout(() => text("#guidedCopySummary", tr("guidedCopySummary")), 1200);
+  } catch {
+    guidedSummaryText.focus();
+    guidedSummaryText.select();
+  }
+}
+
 function syncControlsFromCase() {
   const item = currentCase();
   xPoint.min = item.xMin;
@@ -1437,10 +1784,12 @@ function render() {
   renderGuide();
   renderPlot();
   renderAnalysis();
+  renderGuidedCycle();
   renderQuiz();
 }
 
 function init() {
+  loadGuidedWork();
   languageSelect.value = state.lang;
   renderCaseOptions();
   caseSelect.value = state.caseId;
@@ -1456,6 +1805,8 @@ caseSelect.addEventListener("change", event => {
   state.b = item.defaultB;
   solutionPanel.hidden = true;
   resetQuizState();
+  state.guidedStep = 0;
+  state.guidedSummaryVisible = false;
   setSolutionButtonText();
   syncControlsFromCase();
   render();
@@ -1495,6 +1846,36 @@ document.querySelector("#restartQuiz").addEventListener("click", () => {
   resetQuizState();
   renderQuiz();
 });
+
+guidedStepsNav.addEventListener("click", event => {
+  const button = event.target.closest("[data-step]");
+  if (!button) return;
+  setGuidedStep(Number(button.dataset.step));
+});
+
+guidedResponse.addEventListener("input", event => {
+  updateGuidedAnswer(event.target.value);
+});
+
+guidedChecklist.addEventListener("change", event => {
+  if (!event.target.matches("[data-check]")) return;
+  updateGuidedCheck(Number(event.target.dataset.check), event.target.checked);
+});
+
+document.querySelector("#guidedPrev").addEventListener("click", () => {
+  setGuidedStep(state.guidedStep - 1);
+});
+
+document.querySelector("#guidedNext").addEventListener("click", () => {
+  setGuidedStep(state.guidedStep + 1);
+});
+
+document.querySelector("#guidedClearStep").addEventListener("click", clearGuidedStep);
+document.querySelector("#guidedBuildSummary").addEventListener("click", () => {
+  state.guidedSummaryVisible = true;
+  renderGuidedCycle();
+});
+document.querySelector("#guidedCopySummary").addEventListener("click", copyGuidedSummary);
 
 plot.addEventListener("click", event => {
   const item = currentCase();

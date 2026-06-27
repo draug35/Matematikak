@@ -14,12 +14,12 @@ El laboratorio está diseñado para que el alumnado conecte cuatro registros: f�
 
 ## Secuencia recomendada de aula
 
-1. **5 minutos: predicción sin gráfica.** El alumnado lee la fórmula y escribe dominio, puntos problemáticos y una conjetura.
-2. **12 minutos: contraste visual.** Se activa la gráfica de \(f\), después \(f'\) y finalmente \(f''\). La clase corrige la conjetura inicial.
-3. **10 minutos: lectura local.** Cada pareja elige dos valores de \(x\) y redacta qué significan \(f(x)\), \(f'(x)\) y \(f''(x)\).
-4. **8 minutos: intervalo.** Se activa la integral y se compara integral neta con área geométrica.
-5. **7 minutos: cuestionario adaptado.** El alumnado responde a la pregunta del caso y lee la retroalimentación antes de pasar a la siguiente.
-6. **10 minutos: cierre escrito.** Cada estudiante entrega una conclusión de 6-8 líneas con dominio, comportamiento y justificación.
+1. **5 minutos: Predigo.** El alumnado lee la fórmula y escribe dominio, puntos problemáticos y una conjetura.
+2. **12 minutos: Observo.** Se activa la gráfica de \(f\), después \(f'\) y finalmente \(f''\). La clase corrige la conjetura inicial.
+3. **7 minutos: Respondo.** El alumnado responde al cuestionario adaptado y justifica su elección antes de corregir.
+4. **7 minutos: Corrijo.** Cada estudiante lee la retroalimentación y escribe qué debe cambiar en su razonamiento.
+5. **10 minutos: Justifico.** Cada pareja elige dos valores de \(x\) y redacta qué significan \(f(x)\), \(f'(x)\) y \(f''(x)\).
+6. **8 minutos: Transfiero.** El alumnado plantea una función parecida, cambia una condición o escribe qué miraría primero en un ejercicio nuevo.
 
 ## Uso por casos
 
@@ -41,6 +41,10 @@ El laboratorio está diseñado para que el alumnado conecte cuatro registros: f�
 ## Cuestionario adaptado
 
 El cuestionario no debe usarse como una prueba aislada. Conviene pedir al alumnado que responda primero, lea la pista o corrección y escriba una frase de justificación. La retroalimentación está pensada para reconducir errores habituales: interpretar mal el signo de \(f'\), olvidar el dominio, atravesar una asíntota con una integral o suponer que todo mínimo exige \(f'(x)=0\).
+
+## Ciclo guiado
+
+El panel de ciclo guiado convierte la herramienta en una actividad completa. Cada paso pide una producción escrita y una checklist breve. Al final, el informe del ciclo permite revisar el proceso: predicción inicial, observación, respuesta, corrección, justificación y transferencia.
 
 ## Variantes
 

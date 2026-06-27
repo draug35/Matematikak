@@ -136,6 +136,51 @@
           </article>
         </section>
 
+        <section class="panel guided-panel" aria-label="Ciclo guiado de aprendizaje">
+          <div class="guided-header">
+            <div>
+              <h2 id="guidedTitle">Ciclo guiado</h2>
+              <p id="guidedIntro"></p>
+            </div>
+            <p id="guidedProgress" class="guided-progress"></p>
+          </div>
+
+          <div id="guidedStepsNav" class="guided-steps-nav" aria-label="Pasos del ciclo"></div>
+
+          <article class="guided-step-card">
+            <p id="guidedStepTag" class="guided-step-tag"></p>
+            <h3 id="guidedStepTitle"></h3>
+            <p id="guidedStepPrompt"></p>
+            <ul id="guidedSupportList" class="guided-support"></ul>
+
+            <label id="guidedResponseLabel" class="guided-response-label" for="guidedResponse">Respuesta del alumno</label>
+            <textarea id="guidedResponse" rows="4"></textarea>
+
+            <div class="guided-checklist-wrap">
+              <p id="guidedChecklistTitle" class="guided-checklist-title"></p>
+              <div id="guidedChecklist" class="guided-checklist"></div>
+            </div>
+          </article>
+
+          <div class="guided-actions">
+            <button id="guidedPrev" class="secondary-button compact-button" type="button">Anterior</button>
+            <button id="guidedNext" class="primary-button compact-button" type="button">Siguiente</button>
+            <button id="guidedClearStep" class="secondary-button compact-button" type="button">Limpiar paso</button>
+            <button id="guidedBuildSummary" class="secondary-button compact-button" type="button">Preparar informe</button>
+          </div>
+
+          <div id="guidedSummary" class="guided-summary" hidden>
+            <div class="guided-summary-header">
+              <div>
+                <h3 id="guidedSummaryTitle"></h3>
+                <p id="guidedSummaryIntro"></p>
+              </div>
+              <button id="guidedCopySummary" class="secondary-button compact-button" type="button">Copiar</button>
+            </div>
+            <textarea id="guidedSummaryText" rows="10" readonly></textarea>
+          </div>
+        </section>
+
         <section class="panel quiz-panel" aria-label="Cuestionario adaptado">
           <div class="quiz-header">
             <div>
