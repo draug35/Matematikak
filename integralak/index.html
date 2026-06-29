@@ -1,0 +1,750 @@
+<!DOCTYPE html>
+<html lang="eu">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Zer da integral bat? · Ikasgai interaktiboa</title>
+<style>
+  :root{
+    /* paleta nordikoa, modernoa, argia */
+    --bg:#e8eef1;
+    --bg2:#dde7eb;
+    --ink:#1f3038;
+    --muted:#5f7682;
+    --line:#d6e0e4;
+
+    --fjord:#3a6e80;      /* urdin-berde nagusia */
+    --fjord-l:#5b95a8;
+    --sage:#6f9e8a;       /* berde leuna */
+    --clay:#cc7c5e;       /* terrakota */
+    --gold:#d9a441;       /* hori epela */
+    --sand:#f4eee2;       /* hareazko atzealdea */
+
+    --card:#ffffff;
+    --shadow:0 14px 34px rgba(31,48,56,.10);
+    --shadow-sm:0 6px 16px rgba(31,48,56,.07);
+    --radius:22px;
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{
+    margin:0;
+    font-family:"Segoe UI",system-ui,-apple-system,Roboto,Helvetica,Arial,sans-serif;
+    background:
+      radial-gradient(900px 480px at 88% -8%, #d4e6e8 0%, transparent 55%),
+      radial-gradient(760px 460px at 0% 6%, #e4ead9 0%, transparent 52%),
+      linear-gradient(180deg,#eef3f5,#e3ebee);
+    color:var(--ink);
+    line-height:1.62;
+  }
+  .wrap{max-width:960px;margin:0 auto;padding:24px 20px 90px}
+
+  /* ---------- HERO ---------- */
+  header.hero{
+    text-align:center;
+    padding:54px 24px 42px;
+    border-radius:var(--radius);
+    background:linear-gradient(135deg,#5b95a8 0%,#6f9e8a 100%);
+    color:#ffffff;
+    box-shadow:var(--shadow);
+    position:relative;
+    overflow:hidden;
+  }
+  header.hero::after{
+    content:"∫";
+    position:absolute;
+    font-size:420px;
+    right:-30px;
+    top:-130px;
+    opacity:.12;
+    font-family:Georgia,serif;
+    line-height:1;
+    color:#fff;
+  }
+  header.hero h1{
+    margin:0 0 10px;
+    font-size:clamp(2rem,6vw,3.4rem);
+    letter-spacing:-1px;
+    font-weight:800;
+  }
+  header.hero p{
+    margin:0 auto;
+    max-width:560px;
+    font-size:1.12rem;
+    font-weight:500;
+    opacity:.95;
+  }
+  .badge{
+    display:inline-block;
+    background:rgba(255,255,255,.2);
+    border:1px solid rgba(255,255,255,.35);
+    padding:6px 16px;
+    border-radius:999px;
+    font-size:.82rem;
+    font-weight:700;
+    margin-bottom:18px;
+    text-transform:uppercase;
+    letter-spacing:1.5px;
+  }
+
+  /* ---------- SECTIONS ---------- */
+  section{
+    background:var(--card);
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+    padding:30px;
+    margin-top:24px;
+    box-shadow:var(--shadow-sm);
+  }
+  h2{font-size:1.65rem;margin:0 0 4px;display:flex;align-items:center;gap:12px;font-weight:800;letter-spacing:-.3px}
+  h2 .ico{
+    flex:0 0 auto;width:44px;height:44px;display:grid;place-items:center;
+    border-radius:14px;font-size:1.35rem;
+    background:linear-gradient(135deg,var(--fjord),var(--sage));
+    color:#fff;
+  }
+  h3{font-size:1.15rem;margin:26px 0 6px;color:var(--fjord);font-weight:700}
+  .muted{color:var(--muted)}
+  .lead{font-size:1.12rem}
+
+  .formula{
+    font-family:Georgia,"Times New Roman",serif;
+    font-size:1.5rem;text-align:center;
+    background:var(--sand);
+    border:1px solid #e7ddc9;
+    border-radius:14px;padding:16px;margin:16px 0;
+    color:var(--clay);
+  }
+  .formula small{color:var(--muted);font-size:.8rem}
+  .intg{font-size:1.7rem;vertical-align:-.15em}
+  sub.lim{font-size:.62em;position:relative;left:-1.1em;bottom:-.55em}
+  sup.lim{font-size:.62em;position:relative;left:-1.1em;top:-.5em}
+
+  ul.clean{list-style:none;padding:0;margin:14px 0}
+  ul.clean li{
+    padding:12px 16px;margin:8px 0;
+    background:#f3f7f8;border-left:4px solid var(--fjord-l);border-radius:10px;
+  }
+  ul.clean li b{color:var(--fjord)}
+
+  .grid3{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px;margin-top:16px}
+  .ccard{
+    background:linear-gradient(165deg,#f6faf9,#eef4f3);
+    border:1px solid var(--line);border-radius:16px;padding:18px;
+  }
+  .ccard .em{font-size:1.9rem}
+  .ccard h4{margin:8px 0 4px;font-size:1.05rem}
+  .ccard p{margin:0;font-size:.92rem;color:var(--muted)}
+
+  .duo{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:16px}
+  .duo .box{padding:20px;border-radius:16px}
+  .duo .d{background:linear-gradient(165deg,#fbf1ea,#f6e6db);border:1px solid #eccdb9}
+  .duo .i{background:linear-gradient(165deg,#eaf3ef,#dcebe4);border:1px solid #bdd9cb}
+  .duo h4{margin:0 0 6px;font-size:1.15rem}
+  .duo .d h4{color:var(--clay)} .duo .i h4{color:var(--sage)}
+  .duo .q{font-style:italic;color:var(--ink)}
+  .duo .formula{background:rgba(255,255,255,.6)}
+
+  /* ---------- SIMULATOR ---------- */
+  .sim{
+    background:linear-gradient(165deg,#f4f8f9,#eaf1f3);
+    border:1px solid var(--line);border-radius:18px;padding:20px;margin-top:18px;
+  }
+  .sim-head{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:10px}
+  .sim-head .tag{background:var(--gold);color:#3a2a08;font-weight:700;padding:3px 12px;border-radius:999px;font-size:.78rem}
+  canvas{width:100%;height:auto;background:#fbfdfd;border:1px solid var(--line);border-radius:12px;display:block;touch-action:none}
+  .controls{margin-top:14px;display:grid;gap:14px}
+  .ctrl{display:grid;grid-template-columns:140px 1fr 78px;align-items:center;gap:12px}
+  .ctrl label{font-size:.92rem;color:var(--muted)}
+  .ctrl output{font-variant-numeric:tabular-nums;text-align:right;font-weight:700;color:var(--fjord)}
+  input[type=range]{
+    -webkit-appearance:none;appearance:none;height:6px;border-radius:99px;
+    background:linear-gradient(90deg,var(--fjord),var(--sage));outline:none;
+  }
+  input[type=range]::-webkit-slider-thumb{
+    -webkit-appearance:none;width:22px;height:22px;border-radius:50%;
+    background:#fff;border:3px solid var(--fjord);cursor:pointer;box-shadow:0 2px 8px rgba(31,48,56,.25);
+  }
+  input[type=range]::-moz-range-thumb{width:22px;height:22px;border-radius:50%;background:#fff;border:3px solid var(--fjord);cursor:pointer}
+  .readout{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-top:16px}
+  .stat{background:#fff;border:1px solid var(--line);border-radius:14px;padding:14px;text-align:center}
+  .stat .v{font-size:1.7rem;font-weight:800;color:var(--sage)}
+  .stat .v.approx{color:var(--clay)}
+  .stat .l{font-size:.78rem;color:var(--muted);text-transform:uppercase;letter-spacing:.5px}
+  .hint{
+    font-size:.9rem;color:var(--ink);margin-top:12px;
+    background:rgba(58,110,128,.08);border:1px dashed var(--fjord-l);
+    padding:10px 14px;border-radius:10px;
+  }
+  .hint b{color:var(--fjord)}
+
+  .dual{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+  .dual canvas{width:100%}
+  .cap{font-size:.85rem;color:var(--muted);font-weight:600;margin-bottom:6px;text-align:center}
+  .playbtn{
+    background:linear-gradient(135deg,var(--fjord),var(--sage));color:#fff;border:none;
+    padding:10px 24px;border-radius:999px;font-weight:700;font-size:.95rem;cursor:pointer;
+    box-shadow:var(--shadow-sm);transition:.15s;
+  }
+  .playbtn:hover{filter:brightness(1.06);transform:translateY(-1px)}
+
+  nav.toc{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;margin:24px 0 0}
+  nav.toc a{
+    text-decoration:none;color:var(--ink);background:#fff;border:1px solid var(--line);
+    padding:8px 16px;border-radius:999px;font-size:.9rem;font-weight:600;transition:.2s;box-shadow:var(--shadow-sm);
+  }
+  nav.toc a:hover{background:var(--fjord);color:#fff;border-color:var(--fjord);transform:translateY(-2px)}
+
+  footer{text-align:center;color:var(--muted);margin-top:40px;font-size:.9rem}
+
+  @media(max-width:600px){
+    section{padding:22px 18px}
+    .duo{grid-template-columns:1fr}
+    .dual{grid-template-columns:1fr}
+    .ctrl{grid-template-columns:1fr;gap:4px}
+    .ctrl output{text-align:left}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="hero">
+    <div class="badge">Matematika · Ikasgai bisuala</div>
+    <h1>Zer da integral bat?</h1>
+    <p>Zati txiki asko <strong>batzeko</strong> eta guztizkoa lortzeko tresna: azalerak, distantziak, metatutako ura…</p>
+  </header>
+
+  <nav class="toc">
+    <a href="#idea">Ideia</a>
+    <a href="#area">Kurba azpiko azalera</a>
+    <a href="#tipos">Mugagabea eta mugatua</a>
+    <a href="#derivada">Deribatuarekin lotura</a>
+    <a href="#sim1">🚗 1. simulagailua</a>
+    <a href="#sim2">🏊 2. simulagailua</a>
+    <a href="#sim3">📐 3. simulagailua</a>
+    <a href="#sim4">🧭 4. metatze-funtzioa</a>
+    <a href="#sim5">↔️ 5. azalera negatiboa</a>
+  </nav>
+
+  <!-- ============ IDEIA ============ -->
+  <section id="idea">
+    <h2><span class="ico">💡</span> Oinarrizko ideia</h2>
+    <p class="lead">Integral bat <strong>kopuruak metatzeko</strong> balio duen tresna matematiko bat da.</p>
+    <p>Pixkanaka aldatzen den kopuru bat baduzu, integralak kopuru horren <strong>guztizko metatua</strong> kalkulatzeko aukera ematen dizu.</p>
+    <div class="grid3">
+      <div class="ccard">
+        <div class="em">🚗</div>
+        <h4>Abiadura → Distantzia</h4>
+        <p>Une bakoitzean abiadura ezagutzen baduzu, egindako distantzia osoa kalkulatuko duzu.</p>
+      </div>
+      <div class="ccard">
+        <div class="em">💧</div>
+        <h4>Emaria → Ura</h4>
+        <p>Segundoko zenbat ur sartzen den jakinda, guztira zenbat ur sartu den kalkulatuko duzu.</p>
+      </div>
+      <div class="ccard">
+        <div class="em">📐</div>
+        <h4>Kurba → Azalera</h4>
+        <p>Kurba baten forma ezagututa, azpian dagoen azalera kalkulatuko duzu.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ AZALERA ============ -->
+  <section id="area">
+    <h2><span class="ico">📊</span> Ideia bisuala: kurba azpiko azalera</h2>
+    <p>Integral bat ulertzeko modu oso ohikoa <strong>kurba baten eta ardatz horizontalaren arteko azalera</strong> bezala da.</p>
+    <p><em>f(x)</em> funtzio bat baduzu, <strong>integral mugatuak</strong></p>
+    <div class="formula">
+      <span class="intg">∫</span><sub class="lim">a</sub><sup class="lim">b</sup> f(x) dx
+    </div>
+    <p><em>x = a</em>-tik <em>x = b</em>-ra <strong>kurba azpian metatutako azalera</strong> adierazten du.</p>
+    <p class="muted">Adibidez, <em>f(x)</em> abiadura bada, integral horrek <em>a</em> eta <em>b</em> denboren arteko <strong>egindako distantzia</strong> adierazten du.</p>
+
+    <h3>Zertarako balio du?</h3>
+    <ul class="clean">
+      <li><b>Azalerak</b> — kurba baten azpiko azalera, kurboa eta irregularra izan arren.</li>
+      <li><b>Distantziak</b> — aldatzen den abiadura batetik abiatuta.</li>
+      <li><b>Bolumenak</b> — kurbak biratuz lortutako 3D irudiak.</li>
+      <li><b>Lana eta energia</b> — indar bat posizioarekin aldatzen denean.</li>
+      <li><b>Metatutako kopuruak</b> — populazioa, dirua, kontsumo elektrikoa, likido-fluxua…</li>
+    </ul>
+  </section>
+
+  <!-- ============ MOTAK ============ -->
+  <section id="tipos">
+    <h2><span class="ico">∫</span> Integral mugagabea eta mugatua</h2>
+
+    <h3>1 · Integral mugagabea</h3>
+    <p>Bere deribatutik <strong>jatorrizko funtzioa</strong> bilatzen du:</p>
+    <div class="formula">∫ 2x dx = x² + C</div>
+    <p><em>x²</em>-ren deribatua <em>2x</em> delako. <strong>C</strong> konstante bat agertzen da funtzio askok deribatu bera dutelako:</p>
+    <div class="formula" style="font-size:1.25rem">x² , &nbsp; x² + 5 , &nbsp; x² − 10 &nbsp;<small>→ guztiek dute 2x deribatua</small></div>
+
+    <h3>2 · Integral mugatua</h3>
+    <p><strong>Balio zehatz bat</strong> kalkulatzen du bi mugaren artean. Lehenik antideribatua bilatzen dugu eta gero ebaluatzen:</p>
+    <div class="formula">
+      <span class="intg">∫</span><sub class="lim">0</sub><sup class="lim">2</sup> 2x dx = [ x² ] = 2² − 0² = <span style="color:var(--sage)">4</span>
+    </div>
+    <p class="muted">Hau <em>y = 2x</em> zuzenaren azpiko azalera bezala interpretatzen da, <em>x = 0</em>-tik <em>x = 2</em>-ra. Probatu <a href="#sim3" style="color:var(--fjord)">3. simulagailuan</a>!</p>
+  </section>
+
+  <!-- ============ DERIBATUA ============ -->
+  <section id="derivada">
+    <h2><span class="ico">🔄</span> Deribatuarekin lotura</h2>
+    <div class="duo">
+      <div class="box d">
+        <h4>Deribatua</h4>
+        <p class="q">«Zerbait zein azkar aldatzen den?»</p>
+        <p class="muted">Une bateko aldaketa neurtzen du.</p>
+        <div class="formula" style="margin-bottom:0">d/dx (x²) = 2x</div>
+      </div>
+      <div class="box i">
+        <h4>Integrala</h4>
+        <p class="q">«Guztira zenbat metatu den?»</p>
+        <p class="muted">Aldaketa hori zenbat metatzen den neurtzen du.</p>
+        <div class="formula" style="margin-bottom:0">∫ 2x dx = x² + C</div>
+      </div>
+    </div>
+    <p style="margin-top:16px;text-align:center" class="lead">Deribatzea eta integratzea <strong>alderantzizko eragiketak</strong> dira 🔁</p>
+  </section>
+
+  <!-- ============ SIMULAGAILUA 1 ============ -->
+  <section id="sim1">
+    <h2><span class="ico">🚗</span> 1. simulagailua · Autoa</h2>
+    <p>Auto batek <strong>ez du beti abiadura berbera</strong>. Une bakoitzean abiadura ezagutzen baduzu, integralak <strong>distantzia osoa</strong> ematen dizu = distantzia txiki askoren batura.</p>
+
+    <div class="sim">
+      <div class="sim-head">
+        <span class="tag">Abiadura → Distantzia</span>
+        <span class="muted">Abiaduraren kurbaren azpiko azalera distantzia da.</span>
+      </div>
+      <canvas id="c1" width="820" height="320"></canvas>
+      <div class="controls">
+        <div class="ctrl">
+          <label>Oinarri-abiadura</label>
+          <input type="range" id="s1_base" min="20" max="100" value="60" step="1">
+          <output id="o1_base">60 km/h</output>
+        </div>
+        <div class="ctrl">
+          <label>Aldaketa (azeleratu)</label>
+          <input type="range" id="s1_amp" min="0" max="50" value="30" step="1">
+          <output id="o1_amp">30</output>
+        </div>
+        <div class="ctrl">
+          <label>Zati kopurua</label>
+          <input type="range" id="s1_n" min="1" max="80" value="8" step="1">
+          <output id="o1_n">8</output>
+        </div>
+      </div>
+      <div class="readout">
+        <div class="stat"><div class="v approx" id="r1_aprox">–</div><div class="l">Distantzia (zatien batura)</div></div>
+        <div class="stat"><div class="v" id="r1_real">–</div><div class="l">Distantzia erreala (integrala)</div></div>
+      </div>
+      <div class="hint"><b>Probatu:</b> igo «Zati kopurua». Zenbat eta laukizuzen gehiago, orduan eta gehiago hurbiltzen da batura distantzia errealera. Hori da integratzea!</div>
+    </div>
+  </section>
+
+  <!-- ============ SIMULAGAILUA 2 ============ -->
+  <section id="sim2">
+    <h2><span class="ico">🏊</span> 2. simulagailua · Igerilekua</h2>
+    <p>Igerileku bat mahuka batez betetzen duzu, baina <strong>emaria aldatzen ari da</strong> (norbaitek beste txorrota bat irekitzen du). Segundo bakoitzean ur pixka bat sartzen da. Integralak txorro txiki horiek guztiak batzen ditu <strong>ur guztira</strong> jakiteko.</p>
+
+    <div class="sim">
+      <div class="sim-head">
+        <span class="tag">Emaria → Ura guztira</span>
+        <span class="muted">Emariaren kurbaren azpiko azalera metatutako litroak dira.</span>
+      </div>
+      <canvas id="c2" width="820" height="320"></canvas>
+      <div class="controls">
+        <div class="ctrl">
+          <label>Hasierako emaria</label>
+          <input type="range" id="s2_q0" min="1" max="10" value="6" step="0.5">
+          <output id="o2_q0">6 L/s</output>
+        </div>
+        <div class="ctrl">
+          <label>Ixten da...</label>
+          <input type="range" id="s2_dec" min="0" max="0.5" value="0.3" step="0.02">
+          <output id="o2_dec">azkar</output>
+        </div>
+        <div class="ctrl">
+          <label>Zati kopurua</label>
+          <input type="range" id="s2_n" min="1" max="60" value="6" step="1">
+          <output id="o2_n">6</output>
+        </div>
+      </div>
+      <div class="readout">
+        <div class="stat"><div class="v approx" id="r2_aprox">–</div><div class="l">Ura (zatien batura)</div></div>
+        <div class="stat"><div class="v" id="r2_real">–</div><div class="l">Ura erreala (integrala)</div></div>
+      </div>
+      <div class="hint"><b>Ohartu:</b> emaria konstantea balitz, biderkatzea nahikoa litzateke (emaria × denbora). Aldatzen denez, integrala behar dugu.</div>
+    </div>
+  </section>
+
+  <!-- ============ SIMULAGAILUA 3 ============ -->
+  <section id="sim3">
+    <h2><span class="ico">📐</span> 3. simulagailua · Irudi kurboaren azalera</h2>
+    <p>Goialdean kurba duen irudi batek ez du formula erraza. <strong>Zerrenda mehe askotan</strong> zatitzen dugu (laukizuzen estuak), haien azalerak batzen ditugu, eta zenbat eta meheago, orduan eta zehatzago. Hori da integral bat.</p>
+
+    <div class="sim">
+      <div class="sim-head">
+        <span class="tag">Zerrenda meheak → Azalera</span>
+        <span class="muted">Kurba: y = x² (azalera erreala 0-tik 2-ra = 8/3 ≈ 2,667)</span>
+      </div>
+      <canvas id="c3" width="820" height="320"></canvas>
+      <div class="controls">
+        <div class="ctrl">
+          <label>Funtzioa</label>
+          <input type="range" id="s3_fn" min="0" max="2" value="0" step="1">
+          <output id="o3_fn">y = x²</output>
+        </div>
+        <div class="ctrl">
+          <label>Eskuineko muga (b)</label>
+          <input type="range" id="s3_b" min="1" max="3" value="2" step="0.1">
+          <output id="o3_b">2.0</output>
+        </div>
+        <div class="ctrl">
+          <label>Zerrenda kopurua</label>
+          <input type="range" id="s3_n" min="1" max="120" value="6" step="1">
+          <output id="o3_n">6</output>
+        </div>
+      </div>
+      <div class="readout">
+        <div class="stat"><div class="v approx" id="r3_aprox">–</div><div class="l">Azalera (zerrenden batura)</div></div>
+        <div class="stat"><div class="v" id="r3_real">–</div><div class="l">Azalera erreala (integrala)</div></div>
+        <div class="stat"><div class="v" id="r3_err" style="color:var(--fjord)">–</div><div class="l">Diferentzia (errorea)</div></div>
+      </div>
+      <div class="hint"><b>Esperimentu garrantzitsua:</b> utzi zerrendak 1 edo 2-tan eta begiratu errorea. Gero igo 120 zerrendatara: diferentzia ia desagertzen da. Integrala zerrendak <em>infinituki</em> meheak direnean lortzen den emaitza da.</div>
+    </div>
+  </section>
+
+  <!-- ============ SIMULAGAILUA 4 · METATZE-FUNTZIOA ============ -->
+  <section id="sim4">
+    <h2><span class="ico">🧭</span> 4. simulagailua · Odometroa eta metatze-funtzioa</h2>
+    <p>Hau da gakoa: <strong>integrala ez da zenbaki bakar bat, hazten doan funtzio bat baizik</strong>. Ezkerrean abiadura duzu; <em>x</em> mugitu ahala, azpiko azalera betetzen da. Eskuinean, azalera hori <strong>odometro</strong> baten moduan pilatzen da: hori da <em>F(x)</em> metatze-funtzioa.</p>
+
+    <div class="sim">
+      <div class="sim-head">
+        <span class="tag">Abiadura → Distantzia metatua</span>
+        <span class="muted">Ezkerreko azalera = eskuineko altuera.</span>
+      </div>
+      <div class="dual">
+        <div>
+          <div class="cap">Abiadura · v(t)</div>
+          <canvas id="c4a" width="400" height="300"></canvas>
+        </div>
+        <div>
+          <div class="cap">Distantzia metatua · F(t) — odometroa</div>
+          <canvas id="c4b" width="400" height="300"></canvas>
+        </div>
+      </div>
+      <div class="controls">
+        <div class="ctrl">
+          <label>x-aren posizioa</label>
+          <input type="range" id="s4_x" min="0" max="2" value="1" step="0.02">
+          <output id="o4_x">1.00 h</output>
+        </div>
+      </div>
+      <div class="readout">
+        <div class="stat"><div class="v approx" id="r4_v">–</div><div class="l">Uneko abiadura v(x)</div></div>
+        <div class="stat"><div class="v" id="r4_F">–</div><div class="l">Odometroa F(x) = ∫₀ˣ v</div></div>
+      </div>
+      <div style="text-align:center;margin-top:14px">
+        <button id="play4" class="playbtn">▶ Erreproduzitu</button>
+      </div>
+      <div class="hint"><b>Lotura magikoa:</b> ezkerreko kurbaren <em>altuera</em> (abiadura) eskuineko kurbaren <em>malda</em> da. Horregatik dira deribatzea eta integratzea alderantzizkoak — <strong>Kalkuluaren Oinarrizko Teorema</strong>!</div>
+    </div>
+  </section>
+
+  <!-- ============ SIMULAGAILUA 5 · AZALERA NEGATIBOA ============ -->
+  <section id="sim5">
+    <h2><span class="ico">↔️</span> 5. simulagailua · Azalera negatiboa</h2>
+    <p>Eta kurba ardatzaren <strong>azpitik</strong> badoa? Imajinatu auto bat lehenbizi <strong>aurrera</strong> doala eta gero <strong>atzera</strong>. Ardatzaren gaineko azalera positiboa da (aurrera); azpikoa, negatiboa (atzera). Integralak biak <strong>kenduz</strong> batzen ditu.</p>
+
+    <div class="sim">
+      <div class="sim-head">
+        <span class="tag">Aurrera (+) eta atzera (−)</span>
+        <span class="muted">Berdea = positiboa · Terrakota = negatiboa</span>
+      </div>
+      <canvas id="c5" width="820" height="340"></canvas>
+      <div class="controls">
+        <div class="ctrl">
+          <label>Noraino (b)</label>
+          <input type="range" id="s5_b" min="0.1" max="4" value="4" step="0.1">
+          <output id="o5_b">4.0 h</output>
+        </div>
+      </div>
+      <div class="readout">
+        <div class="stat"><div class="v" id="r5_pos" style="color:var(--sage)">–</div><div class="l">Azalera + (aurrera)</div></div>
+        <div class="stat"><div class="v" id="r5_neg" style="color:var(--clay)">–</div><div class="l">Azalera − (atzera)</div></div>
+        <div class="stat"><div class="v" id="r5_net" style="color:var(--fjord)">–</div><div class="l">Integrala (garbia)</div></div>
+        <div class="stat"><div class="v" id="r5_tot" style="color:var(--gold)">–</div><div class="l">Distantzia osoa</div></div>
+      </div>
+      <div class="hint"><b>Bi galdera, bi erantzun:</b> «Non amaitzen da autoa?» → <em>lekualdaketa garbia</em> (integrala, + eta − kenduta). «Zenbat bide egin du guztira?» → <em>distantzia osoa</em> (+ eta + batuta). Integralak <strong>lehena</strong> ematen du!</div>
+    </div>
+  </section>
+
+  <!-- ============ LABURPENA ============ -->
+  <section>
+    <h2><span class="ico">⭐</span> Gogoratzeko laburpena</h2>
+    <p class="lead">Integral bat <strong>batura txikien superkalkulagailu</strong> bat bezalakoa da.</p>
+    <ul class="clean">
+      <li><b>Distantzia osoa</b>, abiadura aldatzen bada. 🚗</li>
+      <li><b>Ura guztira</b>, emaria aldatzen bada. 💧</li>
+      <li><b>Azalera osoa</b>, irudiak forma kurboa badu. 📐</li>
+    </ul>
+    <p style="text-align:center;font-size:1.15rem;margin-top:18px">
+      Hitz gutxitan: integral batek <strong>zati txiki asko batu eta guztizkoa aurkitzeko</strong> balio du.
+    </p>
+  </section>
+
+  <footer>Ikasgai interaktiboa · Integralak benetan ulertzeko ✨</footer>
+</div>
+
+<script>
+/* ============================================================
+   Marrazketa-tresnak
+   ============================================================ */
+function setupCanvas(id){
+  const c = document.getElementById(id);
+  return {c, ctx:c.getContext('2d')};
+}
+
+const COL = {
+  grid:'#e2eaed', text:'#7a8d97', label:'#1f3038', axis:'#aebcc2',
+  bar:'rgba(58,110,128,.16)', barEdge:'#3a6e80',
+  accent:'#d9a441'
+};
+
+function drawRiemann(ctx, W, H, opts){
+  const {f, a, b, n, color, xlabel, ylabel, yMaxForced} = opts;
+  const padL=52, padR=18, padT=22, padB=40;
+  const plotW = W-padL-padR, plotH = H-padT-padB;
+
+  ctx.clearRect(0,0,W,H);
+
+  let yMax = yMaxForced;
+  if(!yMax){
+    yMax = 0;
+    for(let i=0;i<=200;i++){ const x=a+(b-a)*i/200; yMax=Math.max(yMax,f(x)); }
+    yMax *= 1.15;
+  }
+  const X = x => padL + (x-a)/(b-a)*plotW;
+  const Y = y => padT + plotH - (y/yMax)*plotH;
+
+  // grid + y etiketak
+  ctx.strokeStyle = COL.grid; ctx.lineWidth=1;
+  ctx.fillStyle = COL.text; ctx.font='11px system-ui'; ctx.textAlign='right'; ctx.textBaseline='middle';
+  const steps=4;
+  for(let i=0;i<=steps;i++){
+    const yv = yMax*i/steps, py = Y(yv);
+    ctx.beginPath(); ctx.moveTo(padL,py); ctx.lineTo(W-padR,py); ctx.stroke();
+    ctx.fillText(yv.toFixed(yv<10?1:0), padL-8, py);
+  }
+
+  // laukizuzenak (erdiko puntua)
+  const dx = (b-a)/n;
+  for(let i=0;i<n;i++){
+    const xm = a + dx*(i+0.5), h = f(xm);
+    const px = X(a+dx*i), pw = plotW/n, py = Y(h);
+    ctx.fillStyle = COL.bar; ctx.fillRect(px, py, pw, Y(0)-py);
+    ctx.strokeStyle = COL.barEdge; ctx.lineWidth=1;
+    ctx.strokeRect(px+.5, py+.5, pw-1, Y(0)-py-1);
+  }
+
+  // kurba
+  ctx.strokeStyle = color; ctx.lineWidth=3; ctx.beginPath();
+  for(let i=0;i<=200;i++){
+    const x=a+(b-a)*i/200, px=X(x), py=Y(f(x));
+    i?ctx.lineTo(px,py):ctx.moveTo(px,py);
+  }
+  ctx.stroke();
+
+  // ardatzak
+  ctx.strokeStyle=COL.axis; ctx.lineWidth=2; ctx.beginPath();
+  ctx.moveTo(padL, padT-4); ctx.lineTo(padL, Y(0)); ctx.lineTo(W-padR, Y(0)); ctx.stroke();
+
+  // ardatz-etiketak
+  ctx.fillStyle=COL.label; ctx.font='12px system-ui'; ctx.textAlign='center'; ctx.textBaseline='top';
+  ctx.fillText(xlabel, padL+plotW/2, H-18);
+  ctx.save(); ctx.translate(14, padT+plotH/2); ctx.rotate(-Math.PI/2); ctx.fillText(ylabel,0,0); ctx.restore();
+
+  // a eta b
+  ctx.fillStyle=COL.accent; ctx.textBaseline='top'; ctx.textAlign='center';
+  ctx.fillText('a='+(+a.toFixed(2)), X(a), Y(0)+6);
+  ctx.fillText('b='+(+b.toFixed(2)), X(b), Y(0)+6);
+}
+
+function riemannSum(f,a,b,n){ const dx=(b-a)/n; let s=0; for(let i=0;i<n;i++){ s+=f(a+dx*(i+0.5))*dx; } return s; }
+function integral(f,a,b){ return riemannSum(f,a,b,4000); }
+
+/* ---- SIM 1 · Autoa ---- */
+(function(){
+  const {ctx}=setupCanvas('c1'); const W=820,H=320;
+  const base=s('s1_base'),amp=s('s1_amp'),n=s('s1_n');
+  const ob=s('o1_base'),oa=s('o1_amp'),on=s('o1_n');
+  const rA=s('r1_aprox'),rR=s('r1_real');
+  function render(){
+    const B=+base.value,A=+amp.value,N=+n.value;
+    ob.textContent=B+' km/h'; oa.textContent=A; on.textContent=N;
+    const v = t => B + A*Math.sin(t*Math.PI);
+    drawRiemann(ctx,W,H,{f:v,a:0,b:2,n:N,color:'#cc7c5e',xlabel:'denbora (orduak)',ylabel:'abiadura (km/h)',yMaxForced:155});
+    rA.textContent=riemannSum(v,0,2,N).toFixed(1)+' km';
+    rR.textContent=integral(v,0,2).toFixed(1)+' km';
+  }
+  [base,amp,n].forEach(e=>e.addEventListener('input',render)); render();
+})();
+
+/* ---- SIM 2 · Igerilekua ---- */
+(function(){
+  const {ctx}=setupCanvas('c2'); const W=820,H=320;
+  const q0=s('s2_q0'),dec=s('s2_dec'),n=s('s2_n');
+  const oq=s('o2_q0'),od=s('o2_dec'),on=s('o2_n');
+  const rA=s('r2_aprox'),rR=s('r2_real');
+  function render(){
+    const Q=+q0.value,D=+dec.value,N=+n.value;
+    oq.textContent=Q+' L/s'; on.textContent=N;
+    od.textContent = D<0.05?'ozta-ozta':(D<0.2?'motel':(D<0.38?'normal':'azkar'));
+    const q = t => Q*Math.exp(-D*t);
+    drawRiemann(ctx,W,H,{f:q,a:0,b:10,n:N,color:'#3a6e80',xlabel:'denbora (segundoak)',ylabel:'emaria (L/s)',yMaxForced:11});
+    rA.textContent=riemannSum(q,0,10,N).toFixed(1)+' L';
+    rR.textContent=integral(q,0,10).toFixed(1)+' L';
+  }
+  [q0,dec,n].forEach(e=>e.addEventListener('input',render)); render();
+})();
+
+/* ---- SIM 3 · Azalera ---- */
+(function(){
+  const {ctx}=setupCanvas('c3'); const W=820,H=320;
+  const fnEl=s('s3_fn'),bEl=s('s3_b'),nEl=s('s3_n');
+  const ofn=s('o3_fn'),ob=s('o3_b'),on=s('o3_n');
+  const rA=s('r3_aprox'),rR=s('r3_real'),rE=s('r3_err');
+  const fns=[
+    {name:'y = x²', f:x=>x*x},
+    {name:'y = 2x', f:x=>2*x},
+    {name:'y = x³−2x+3', f:x=>x*x*x-2*x+3},
+  ];
+  function render(){
+    const fn=fns[+fnEl.value],B=+bEl.value,N=+nEl.value;
+    ofn.textContent=fn.name; ob.textContent=B.toFixed(1); on.textContent=N;
+    drawRiemann(ctx,W,H,{f:fn.f,a:0,b:B,n:N,color:'#6f9e8a',xlabel:'x',ylabel:'y = f(x)'});
+    const aprox=riemannSum(fn.f,0,B,N),real=integral(fn.f,0,B);
+    rA.textContent=aprox.toFixed(3); rR.textContent=real.toFixed(3); rE.textContent=Math.abs(real-aprox).toFixed(3);
+  }
+  [fnEl,bEl,nEl].forEach(e=>e.addEventListener('input',render)); render();
+})();
+
+/* ---- SIM 4 · Metatze-funtzioa (Kalkuluaren Oinarrizko Teorema) ---- */
+(function(){
+  const ga=s('c4a').getContext('2d'), gb=s('c4b').getContext('2d');
+  const W=400,H=300;
+  const xEl=s('s4_x'), ox=s('o4_x'), rV=s('r4_v'), rF=s('r4_F');
+  const a=0,b=2, vMax=110, FMax=130;
+  const v = t => 60 + 30*Math.sin(Math.PI*t);
+  function F(x){ const N=400, dx=x/N; let acc=0; for(let i=0;i<N;i++){ acc+=v(dx*(i+0.5))*dx; } return acc; }
+  const padL=46,padR=14,padT=18,padB=34;
+  const pW=W-padL-padR, pH=H-padT-padB;
+  const Xp = t => padL + (t-a)/(b-a)*pW;
+  const Yp = (y,yMax) => padT + pH - (y/yMax)*pH;
+  function frame(g,yMax){
+    g.clearRect(0,0,W,H);
+    g.strokeStyle=COL.grid;g.lineWidth=1;g.fillStyle=COL.text;g.font='10px system-ui';g.textAlign='right';g.textBaseline='middle';
+    for(let i=0;i<=4;i++){const yv=yMax*i/4,py=Yp(yv,yMax);g.beginPath();g.moveTo(padL,py);g.lineTo(W-padR,py);g.stroke();g.fillText(yv.toFixed(0),padL-6,py);}
+    g.strokeStyle=COL.axis;g.lineWidth=2;g.beginPath();g.moveTo(padL,padT-2);g.lineTo(padL,padT+pH);g.lineTo(W-padR,padT+pH);g.stroke();
+    g.fillStyle=COL.label;g.font='11px system-ui';g.textAlign='center';g.textBaseline='top';g.fillText('t (orduak)',padL+pW/2,H-15);
+  }
+  function render(){
+    const X=+xEl.value; ox.textContent=X.toFixed(2)+' h';
+    // EZKERRA: abiadura + betetako azalera
+    frame(ga,vMax);
+    ga.fillStyle='rgba(111,158,138,.32)';
+    ga.beginPath();ga.moveTo(Xp(0),Yp(0,vMax));
+    for(let i=0;i<=120;i++){const t=a+(X-a)*i/120;ga.lineTo(Xp(t),Yp(v(t),vMax));}
+    ga.lineTo(Xp(X),Yp(0,vMax));ga.closePath();ga.fill();
+    ga.strokeStyle='#cc7c5e';ga.lineWidth=3;ga.beginPath();
+    for(let i=0;i<=200;i++){const t=a+(b-a)*i/200,px=Xp(t),py=Yp(v(t),vMax);i?ga.lineTo(px,py):ga.moveTo(px,py);}
+    ga.stroke();
+    ga.strokeStyle='#3a6e80';ga.setLineDash([4,4]);ga.lineWidth=1.5;ga.beginPath();ga.moveTo(Xp(X),padT);ga.lineTo(Xp(X),Yp(0,vMax));ga.stroke();ga.setLineDash([]);
+    // ESKUINA: metatze-funtzioa
+    frame(gb,FMax);
+    gb.strokeStyle='rgba(58,110,128,.22)';gb.lineWidth=2;gb.beginPath();
+    for(let i=0;i<=120;i++){const t=a+(b-a)*i/120,px=Xp(t),py=Yp(F(t),FMax);i?gb.lineTo(px,py):gb.moveTo(px,py);}
+    gb.stroke();
+    gb.strokeStyle='#3a6e80';gb.lineWidth=3.5;gb.beginPath();
+    for(let i=0;i<=120;i++){const t=a+(X-a)*i/120,px=Xp(t),py=Yp(F(t),FMax);i?gb.lineTo(px,py):gb.moveTo(px,py);}
+    gb.stroke();
+    const fx=F(X);
+    gb.fillStyle='#d9a441';gb.beginPath();gb.arc(Xp(X),Yp(fx,FMax),6,0,7);gb.fill();
+    gb.strokeStyle='#fff';gb.lineWidth=2;gb.stroke();
+    rV.textContent=v(X).toFixed(1)+' km/h';
+    rF.textContent=fx.toFixed(1)+' km';
+  }
+  xEl.addEventListener('input',render);
+  let anim=null;
+  s('play4').addEventListener('click',()=>{
+    if(anim){cancelAnimationFrame(anim);anim=null;}
+    let t0=null;const dur=4200;
+    function step(ts){ if(!t0)t0=ts; const p=Math.min((ts-t0)/dur,1);
+      xEl.value=(a+(b-a)*p).toFixed(2); render();
+      if(p<1) anim=requestAnimationFrame(step); else anim=null;
+    }
+    xEl.value=a; render(); anim=requestAnimationFrame(step);
+  });
+  render();
+})();
+
+/* ---- SIM 5 · Azalera negatiboa (zeinudun azalera) ---- */
+(function(){
+  const {ctx}=setupCanvas('c5'); const W=820,H=340;
+  const bEl=s('s5_b'),ob=s('o5_b');
+  const rP=s('r5_pos'),rN=s('r5_neg'),rNet=s('r5_net'),rT=s('r5_tot');
+  const a=0,bMax=4, amp=40, yMax=amp*1.25;
+  const v = t => amp*Math.sin(Math.PI*t/2); // + 0..2, − 2..4
+  const padL=52,padR=18,padT=22,padB=42;
+  const pW=W-padL-padR, pH=H-padT-padB;
+  const X = t => padL + (t-a)/(bMax-a)*pW;
+  const Y = y => padT + pH/2 - (y/yMax)*(pH/2);
+  function render(){
+    const B=+bEl.value; ob.textContent=B.toFixed(1)+' h';
+    ctx.clearRect(0,0,W,H);
+    // sareta
+    ctx.strokeStyle=COL.grid;ctx.lineWidth=1;ctx.fillStyle=COL.text;ctx.font='11px system-ui';ctx.textAlign='right';ctx.textBaseline='middle';
+    for(let yv=-40;yv<=40;yv+=20){const py=Y(yv);ctx.beginPath();ctx.moveTo(padL,py);ctx.lineTo(W-padR,py);ctx.stroke();ctx.fillText(yv,padL-6,py);}
+    // betetako azalera (zeinuaren arabera)
+    const steps=320;
+    for(let i=0;i<steps;i++){
+      const t1=a+(B-a)*i/steps, t2=a+(B-a)*(i+1)/steps, y1=v(t1), y2=v(t2);
+      ctx.fillStyle = ((y1+y2)/2>=0) ? 'rgba(111,158,138,.38)' : 'rgba(204,124,94,.38)';
+      ctx.beginPath();ctx.moveTo(X(t1),Y(0));ctx.lineTo(X(t1),Y(y1));ctx.lineTo(X(t2),Y(y2));ctx.lineTo(X(t2),Y(0));ctx.closePath();ctx.fill();
+    }
+    // kurba osoa
+    ctx.strokeStyle='#3a6e80';ctx.lineWidth=3;ctx.beginPath();
+    for(let i=0;i<=320;i++){const t=a+(bMax-a)*i/320,px=X(t),py=Y(v(t));i?ctx.lineTo(px,py):ctx.moveTo(px,py);}
+    ctx.stroke();
+    // ardatzak (zero erdian)
+    ctx.strokeStyle=COL.axis;ctx.lineWidth=2;
+    ctx.beginPath();ctx.moveTo(padL,Y(0));ctx.lineTo(W-padR,Y(0));ctx.stroke();
+    ctx.beginPath();ctx.moveTo(padL,padT);ctx.lineTo(padL,padT+pH);ctx.stroke();
+    // b lerro bertikala
+    ctx.strokeStyle='#d9a441';ctx.setLineDash([5,4]);ctx.lineWidth=1.5;ctx.beginPath();ctx.moveTo(X(B),padT);ctx.lineTo(X(B),padT+pH);ctx.stroke();ctx.setLineDash([]);
+    // etiketak
+    ctx.fillStyle=COL.label;ctx.font='12px system-ui';ctx.textAlign='center';ctx.textBaseline='top';
+    ctx.fillText('denbora (orduak)',padL+pW/2,H-16);
+    ctx.textAlign='left';ctx.fillStyle='#6f9e8a';ctx.fillText('▲ aurrera (+)',padL+6,padT+2);
+    ctx.fillStyle='#cc7c5e';ctx.textBaseline='bottom';ctx.fillText('▼ atzera (−)',padL+6,padT+pH-2);
+    // kalkuluak
+    const N=2000,dx=B/N; let pos=0,neg=0;
+    for(let i=0;i<N;i++){ const val=v(a+dx*(i+0.5))*dx; if(val>=0)pos+=val; else neg+=val; }
+    rP.textContent=pos.toFixed(1)+' km';
+    rN.textContent=neg.toFixed(1)+' km';
+    rNet.textContent=(pos+neg).toFixed(1)+' km';
+    rT.textContent=(pos-neg).toFixed(1)+' km';
+  }
+  bEl.addEventListener('input',render); render();
+})();
+
+function s(id){return document.getElementById(id);}
+</script>
+</body>
+</html>
