@@ -1,0 +1,2402 @@
+<!doctype html>
+<html lang="eu">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Funtzioak: makinatik grafikora</title>
+  <style>
+    :root {
+      --bg: #f7faf9;
+      --paper: #ffffff;
+      --ink: #132337;
+      --muted: #5d6f7d;
+      --line: #d8e3e6;
+      --grid: #d9e3e8;
+      --teal: #087f78;
+      --teal-2: #e5f5f3;
+      --amber: #d97706;
+      --amber-2: #fff4df;
+      --blue: #2563eb;
+      --red: #dc2626;
+      --green: #15803d;
+      --violet: #7c3aed;
+      --shadow: 0 18px 55px rgba(19, 35, 55, 0.08);
+      --radius: 8px;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      margin: 0;
+      color: var(--ink);
+      background:
+        linear-gradient(180deg, rgba(8, 127, 120, 0.08), transparent 34rem),
+        var(--bg);
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      line-height: 1.55;
+      overflow-x: hidden;
+    }
+
+    button,
+    input,
+    select {
+      font: inherit;
+    }
+
+    button {
+      cursor: pointer;
+    }
+
+    a {
+      color: inherit;
+    }
+
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 20;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      min-height: 68px;
+      padding: 0.75rem clamp(1rem, 4vw, 3rem);
+      border-bottom: 1px solid var(--line);
+      background: rgba(255, 255, 255, 0.92);
+      backdrop-filter: blur(16px);
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      min-width: 0;
+    }
+
+    .brand-mark {
+      display: grid;
+      flex: 0 0 auto;
+      width: 42px;
+      height: 42px;
+      place-items: center;
+      border-radius: 8px;
+      color: white;
+      background: var(--teal);
+      box-shadow: 0 10px 24px rgba(8, 127, 120, 0.24);
+    }
+
+    .brand strong {
+      display: block;
+      font-size: 1rem;
+      line-height: 1.1;
+    }
+
+    .brand span {
+      display: block;
+      color: var(--muted);
+      font-size: 0.88rem;
+    }
+
+    .nav {
+      display: flex;
+      align-items: center;
+      gap: 0.35rem;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+      max-width: 100%;
+    }
+
+    .nav a {
+      display: inline-flex;
+      align-items: center;
+      min-height: 38px;
+      padding: 0.45rem 0.7rem;
+      border-radius: 8px;
+      color: #243647;
+      font-size: 0.92rem;
+      font-weight: 650;
+      text-decoration: none;
+    }
+
+    .nav a:hover,
+    .nav a:focus-visible {
+      background: var(--teal-2);
+      outline: none;
+    }
+
+    main {
+      width: min(1480px, 100%);
+      margin: 0 auto;
+      padding: clamp(1rem, 3vw, 2.75rem);
+    }
+
+    .hero,
+    .intro,
+    .lab,
+    .panel,
+    .graph-layout,
+    .two-col,
+    .comparison-layout,
+    .controls,
+    .svg-wrap,
+    .table-panel {
+      min-width: 0;
+    }
+
+    .hero {
+      display: grid;
+      grid-template-columns: minmax(300px, 0.92fr) minmax(520px, 1.35fr);
+      gap: clamp(1.25rem, 3vw, 2.5rem);
+      align-items: start;
+      min-height: calc(100svh - 92px);
+      padding-top: clamp(1rem, 2vw, 1.5rem);
+    }
+
+    .intro {
+      position: sticky;
+      top: 92px;
+      display: grid;
+      gap: 1rem;
+      align-self: start;
+    }
+
+    h1,
+    h2,
+    h3,
+    p {
+      margin-top: 0;
+    }
+
+    h1 {
+      max-width: 10ch;
+      margin-bottom: 0.8rem;
+      font-size: clamp(2.45rem, 5vw, 5rem);
+      line-height: 1.02;
+      letter-spacing: 0;
+    }
+
+    .lead {
+      max-width: 62ch;
+      color: #34485c;
+      font-size: clamp(1.02rem, 1.4vw, 1.18rem);
+      overflow-wrap: anywhere;
+    }
+
+    .formula-band {
+      display: grid;
+      gap: 0.8rem;
+      padding: 1rem;
+      border: 1px solid rgba(8, 127, 120, 0.22);
+      border-radius: var(--radius);
+      background: linear-gradient(135deg, #ffffff, #f1fbfa);
+    }
+
+    .machine-row {
+      display: grid;
+      grid-template-columns: 1fr auto 1.25fr auto 1fr;
+      align-items: center;
+      gap: 0.7rem;
+      min-height: 52px;
+      text-align: center;
+      font-size: clamp(1.1rem, 2vw, 1.55rem);
+      font-weight: 800;
+    }
+
+    .machine-row span {
+      min-width: 0;
+    }
+
+    .machine-box {
+      padding: 0.55rem 0.7rem;
+      border: 1px solid rgba(217, 119, 6, 0.32);
+      border-radius: 8px;
+      background: #fffaf1;
+      color: #6f3b00;
+      font-size: 1rem;
+    }
+
+    .big-formula {
+      display: flex;
+      align-items: baseline;
+      justify-content: center;
+      gap: 0.45rem;
+      min-height: 66px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: white;
+      font-family: Georgia, "Times New Roman", serif;
+      font-size: clamp(2rem, 4vw, 3.1rem);
+      line-height: 1;
+    }
+
+    .big-formula .m-color {
+      color: var(--teal);
+      font-weight: 800;
+    }
+
+    .big-formula .b-color {
+      color: var(--amber);
+      font-weight: 800;
+    }
+
+    .note {
+      margin: 0;
+      color: var(--muted);
+      font-size: 0.96rem;
+    }
+
+    .concept-list {
+      display: grid;
+      gap: 0.75rem;
+    }
+
+    .concept {
+      display: grid;
+      grid-template-columns: auto 1fr;
+      gap: 0.75rem;
+      align-items: start;
+      padding: 0.85rem;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: rgba(255, 255, 255, 0.8);
+    }
+
+    .concept svg {
+      width: 30px;
+      height: 30px;
+      color: var(--teal);
+    }
+
+    .concept h3 {
+      margin-bottom: 0.15rem;
+      font-size: 1rem;
+    }
+
+    .concept p {
+      margin-bottom: 0;
+      color: var(--muted);
+      font-size: 0.94rem;
+    }
+
+    .lab {
+      display: grid;
+      gap: 1rem;
+    }
+
+    .panel {
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: rgba(255, 255, 255, 0.94);
+      box-shadow: var(--shadow);
+    }
+
+    .graph-panel {
+      display: grid;
+      gap: 1rem;
+      padding: clamp(1rem, 2vw, 1.4rem);
+    }
+
+    .section-head {
+      display: flex;
+      align-items: start;
+      justify-content: space-between;
+      gap: 1rem;
+      margin-bottom: 0.4rem;
+    }
+
+    .section-head h2 {
+      margin-bottom: 0.2rem;
+      font-size: clamp(1.35rem, 2vw, 2rem);
+      line-height: 1.1;
+    }
+
+    .section-head p {
+      margin-bottom: 0;
+      color: var(--muted);
+    }
+
+    .button-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      justify-content: flex-end;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.4rem;
+      min-height: 40px;
+      padding: 0.55rem 0.85rem;
+      border: 1px solid rgba(8, 127, 120, 0.35);
+      border-radius: 8px;
+      background: white;
+      color: var(--teal);
+      font-size: 0.92rem;
+      font-weight: 760;
+    }
+
+    .btn.primary {
+      background: var(--teal);
+      color: white;
+    }
+
+    .btn:hover,
+    .btn:focus-visible {
+      box-shadow: 0 0 0 4px rgba(8, 127, 120, 0.14);
+      outline: none;
+    }
+
+    .graph-layout {
+      display: grid;
+      grid-template-columns: minmax(390px, 1fr) 300px;
+      gap: 1rem;
+      align-items: stretch;
+    }
+
+    .svg-wrap {
+      min-height: 480px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      overflow: hidden;
+      background: #ffffff;
+    }
+
+    #graph {
+      display: block;
+      width: 100%;
+      min-height: 480px;
+      touch-action: none;
+    }
+
+    .controls {
+      display: grid;
+      gap: 0.9rem;
+      align-content: start;
+      padding: 0.95rem;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: #fbfdfd;
+    }
+
+    .control {
+      display: grid;
+      gap: 0.42rem;
+    }
+
+    .control-line {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.7rem;
+    }
+
+    label,
+    .label {
+      color: #213549;
+      font-size: 0.92rem;
+      font-weight: 760;
+    }
+
+    .value-chip {
+      display: inline-flex;
+      min-width: 56px;
+      justify-content: center;
+      padding: 0.22rem 0.45rem;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: white;
+      font-variant-numeric: tabular-nums;
+      font-weight: 800;
+    }
+
+    input[type="range"] {
+      width: 100%;
+      accent-color: var(--teal);
+    }
+
+    .control:nth-child(2) input[type="range"] {
+      accent-color: var(--amber);
+    }
+
+    .check-row {
+      display: flex;
+      align-items: center;
+      gap: 0.55rem;
+      min-height: 34px;
+      color: var(--muted);
+      font-size: 0.94rem;
+      font-weight: 650;
+    }
+
+    .check-row input {
+      width: 18px;
+      height: 18px;
+      accent-color: var(--teal);
+    }
+
+    .formula-live {
+      display: grid;
+      gap: 0.35rem;
+      padding: 0.85rem;
+      border: 1px solid rgba(217, 119, 6, 0.28);
+      border-radius: var(--radius);
+      background: var(--amber-2);
+      text-align: center;
+    }
+
+    .formula-live strong {
+      font-family: Georgia, "Times New Roman", serif;
+      font-size: 1.75rem;
+      line-height: 1.1;
+    }
+
+    .readout-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 0.75rem;
+    }
+
+    .readout {
+      min-height: 110px;
+      padding: 0.85rem;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: white;
+    }
+
+    .readout h3 {
+      margin-bottom: 0.25rem;
+      color: var(--teal);
+      font-size: 0.92rem;
+      text-transform: uppercase;
+    }
+
+    .readout strong {
+      display: block;
+      font-size: clamp(1.35rem, 2vw, 2.1rem);
+      line-height: 1.12;
+    }
+
+    .readout p {
+      margin: 0.3rem 0 0;
+      color: var(--muted);
+      font-size: 0.92rem;
+    }
+
+    .wide-sections {
+      display: grid;
+      gap: clamp(1rem, 2.4vw, 1.6rem);
+      margin-top: clamp(1.25rem, 4vw, 3rem);
+    }
+
+    .band {
+      padding: clamp(1rem, 3vw, 1.6rem);
+    }
+
+    .band h2 {
+      font-size: clamp(1.45rem, 2.4vw, 2.25rem);
+      line-height: 1.12;
+    }
+
+    .two-col {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(320px, 0.85fr);
+      gap: clamp(1rem, 3vw, 1.7rem);
+      align-items: start;
+    }
+
+    .steps {
+      display: grid;
+      gap: 0.75rem;
+      margin: 1rem 0 0;
+      padding: 0;
+      list-style: none;
+    }
+
+    .steps li {
+      display: grid;
+      grid-template-columns: auto 1fr;
+      gap: 0.75rem;
+      align-items: start;
+      padding: 0.85rem;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: white;
+    }
+
+    .step-num {
+      display: grid;
+      width: 32px;
+      height: 32px;
+      place-items: center;
+      border-radius: 50%;
+      background: var(--teal);
+      color: white;
+      font-weight: 850;
+    }
+
+    .steps h3 {
+      margin-bottom: 0.15rem;
+      font-size: 1rem;
+    }
+
+    .steps p {
+      margin-bottom: 0;
+      color: var(--muted);
+    }
+
+    .table-panel {
+      overflow: hidden;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: white;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-variant-numeric: tabular-nums;
+    }
+
+    caption {
+      padding: 0.75rem;
+      color: var(--muted);
+      text-align: left;
+      font-weight: 760;
+    }
+
+    th,
+    td {
+      padding: 0.68rem 0.7rem;
+      border-top: 1px solid var(--line);
+      text-align: center;
+    }
+
+    th {
+      background: #f1f7f8;
+      color: #22384b;
+      font-size: 0.9rem;
+    }
+
+    tr.highlight-row td {
+      background: #fff7ed;
+      color: #8a4300;
+      font-weight: 820;
+    }
+
+    .context-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 0.8rem;
+      margin-top: 1rem;
+    }
+
+    .context-button {
+      min-height: 150px;
+      padding: 0.9rem;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: white;
+      color: var(--ink);
+      text-align: left;
+    }
+
+    .context-button[aria-pressed="true"] {
+      border-color: rgba(8, 127, 120, 0.65);
+      background: var(--teal-2);
+      box-shadow: 0 0 0 4px rgba(8, 127, 120, 0.11);
+    }
+
+    .context-button strong {
+      display: block;
+      margin-bottom: 0.3rem;
+      color: var(--teal);
+      font-size: 1.02rem;
+    }
+
+    .context-button span {
+      display: block;
+      color: var(--muted);
+      font-size: 0.92rem;
+    }
+
+    .story-box {
+      min-height: 220px;
+      padding: 1rem;
+      border: 1px solid rgba(217, 119, 6, 0.28);
+      border-radius: var(--radius);
+      background: #fffaf1;
+    }
+
+    .story-box h3 {
+      color: #8a4300;
+    }
+
+    .story-box p {
+      color: #4d3b24;
+    }
+
+    .story-equation {
+      display: inline-flex;
+      padding: 0.45rem 0.7rem;
+      border: 1px solid rgba(217, 119, 6, 0.36);
+      border-radius: 8px;
+      background: white;
+      font-family: Georgia, "Times New Roman", serif;
+      font-size: 1.45rem;
+      font-weight: 800;
+    }
+
+    .comparison-layout {
+      display: grid;
+      grid-template-columns: minmax(350px, 1fr) minmax(280px, 0.8fr);
+      gap: 1rem;
+      align-items: start;
+    }
+
+    .mini-graph {
+      width: 100%;
+      min-height: 340px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: white;
+    }
+
+    .segmented {
+      display: grid;
+      gap: 0.55rem;
+    }
+
+    .segmented button {
+      min-height: 48px;
+      padding: 0.65rem 0.75rem;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: white;
+      color: var(--ink);
+      text-align: left;
+      font-weight: 780;
+    }
+
+    .segmented button[aria-pressed="true"] {
+      border-color: rgba(37, 99, 235, 0.5);
+      background: #eff6ff;
+      color: #184bb8;
+    }
+
+    .quiz-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 0.85rem;
+      margin-top: 1rem;
+    }
+
+    .quiz-item {
+      display: grid;
+      gap: 0.65rem;
+      padding: 0.95rem;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: white;
+    }
+
+    .quiz-item h3 {
+      margin-bottom: 0;
+      font-size: 1rem;
+    }
+
+    .answer-line {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 0.55rem;
+      align-items: center;
+    }
+
+    .answer-line input {
+      width: 100%;
+      min-height: 40px;
+      padding: 0.45rem 0.6rem;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+    }
+
+    .feedback {
+      min-height: 44px;
+      margin: 0;
+      color: var(--muted);
+      font-size: 0.92rem;
+    }
+
+    .feedback.ok {
+      color: var(--green);
+      font-weight: 760;
+    }
+
+    .feedback.no {
+      color: var(--red);
+      font-weight: 760;
+    }
+
+    .learning-panel {
+      display: grid;
+      gap: 1rem;
+    }
+
+    .learning-intro {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: 1rem;
+      align-items: start;
+    }
+
+    .progress-pill {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 38px;
+      padding: 0.35rem 0.75rem;
+      border: 1px solid rgba(8, 127, 120, 0.32);
+      border-radius: 999px;
+      background: var(--teal-2);
+      color: #07615c;
+      font-size: 0.88rem;
+      font-weight: 820;
+      white-space: nowrap;
+    }
+
+    .activity-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 1rem;
+    }
+
+    .learning-card {
+      display: grid;
+      gap: 0.8rem;
+      align-content: start;
+      min-height: 360px;
+      padding: 1rem;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: white;
+    }
+
+    .learning-card h3 {
+      margin-bottom: 0.15rem;
+      font-size: 1.12rem;
+    }
+
+    .learning-card p {
+      color: var(--muted);
+    }
+
+    .prompt-box {
+      padding: 0.75rem;
+      border-left: 4px solid var(--teal);
+      border-radius: 0 8px 8px 0;
+      background: #f2fbfa;
+      color: #18384a;
+      font-weight: 720;
+    }
+
+    .choice-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 0.55rem;
+    }
+
+    .choice-button {
+      min-height: 48px;
+      padding: 0.65rem 0.75rem;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fbfdfd;
+      color: var(--ink);
+      text-align: left;
+      font-weight: 760;
+    }
+
+    .choice-button[aria-pressed="true"] {
+      border-color: rgba(8, 127, 120, 0.6);
+      background: var(--teal-2);
+      color: #075f5b;
+      box-shadow: 0 0 0 3px rgba(8, 127, 120, 0.12);
+    }
+
+    textarea,
+    .micro-form input,
+    .micro-form select {
+      width: 100%;
+      min-height: 42px;
+      padding: 0.55rem 0.65rem;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: white;
+      color: var(--ink);
+    }
+
+    textarea {
+      resize: vertical;
+    }
+
+    .micro-form {
+      display: grid;
+      gap: 0.7rem;
+    }
+
+    .field-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 0.65rem;
+    }
+
+    .field-grid label,
+    .micro-form > label {
+      display: grid;
+      gap: 0.3rem;
+    }
+
+    .mini-detective {
+      width: 100%;
+      min-height: 260px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: #fbfdfd;
+    }
+
+    .status-box {
+      min-height: 52px;
+      margin: 0;
+      padding: 0.7rem;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fbfdfd;
+      color: var(--muted);
+      font-size: 0.95rem;
+    }
+
+    .status-box.ok {
+      border-color: rgba(21, 128, 61, 0.28);
+      background: #effaf2;
+      color: var(--green);
+      font-weight: 760;
+    }
+
+    .status-box.no {
+      border-color: rgba(220, 38, 38, 0.26);
+      background: #fff1f2;
+      color: var(--red);
+      font-weight: 760;
+    }
+
+    .teacher-tools {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 0.75rem;
+      padding: 0.9rem;
+      border: 1px dashed rgba(8, 127, 120, 0.35);
+      border-radius: var(--radius);
+      background: rgba(229, 245, 243, 0.72);
+    }
+
+    .tool-toggle {
+      display: flex;
+      align-items: center;
+      gap: 0.55rem;
+      min-height: 42px;
+      color: #1e4f4c;
+      font-size: 0.92rem;
+      font-weight: 760;
+    }
+
+    .tool-toggle input {
+      width: 18px;
+      height: 18px;
+      accent-color: var(--teal);
+    }
+
+    .teacher-summary {
+      display: none;
+      padding: 0.85rem;
+      border: 1px solid rgba(37, 99, 235, 0.25);
+      border-radius: var(--radius);
+      background: #eff6ff;
+      color: #173d7a;
+      white-space: pre-wrap;
+    }
+
+    .teacher-summary.is-visible {
+      display: block;
+    }
+
+    body.hide-formulas .big-formula,
+    body.hide-formulas .formula-live,
+    body.hide-formulas .story-equation {
+      filter: blur(8px);
+      user-select: none;
+    }
+
+    body.project-mode {
+      --shadow: 0 14px 45px rgba(19, 35, 55, 0.05);
+    }
+
+    body.project-mode .topbar {
+      position: static;
+    }
+
+    body.project-mode main {
+      width: min(1760px, 100%);
+    }
+
+    body.project-mode .hero {
+      grid-template-columns: minmax(360px, 0.8fr) minmax(680px, 1.55fr);
+    }
+
+    .synthesis {
+      display: grid;
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      gap: 0.8rem;
+    }
+
+    .synthesis article {
+      min-height: 170px;
+      padding: 0.9rem;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: white;
+    }
+
+    .synthesis h3 {
+      margin-bottom: 0.45rem;
+      color: var(--teal);
+      font-size: 1rem;
+    }
+
+    .synthesis p {
+      margin-bottom: 0;
+      color: var(--muted);
+      font-size: 0.92rem;
+    }
+
+    .teacher-note {
+      margin-top: 1rem;
+      padding: 0.9rem;
+      border: 1px dashed rgba(8, 127, 120, 0.35);
+      border-radius: var(--radius);
+      background: rgba(229, 245, 243, 0.72);
+      color: #1e4f4c;
+    }
+
+    .footer {
+      padding: 1.5rem 0 0.5rem;
+      color: var(--muted);
+      text-align: center;
+      font-size: 0.92rem;
+    }
+
+    .axis-label {
+      font-size: 13px;
+      fill: #172536;
+      font-weight: 800;
+    }
+
+    .tick-label {
+      font-size: 11px;
+      fill: #506172;
+    }
+
+    .graph-label {
+      paint-order: stroke;
+      stroke: white;
+      stroke-width: 4px;
+      fill: var(--blue);
+      font-size: 14px;
+      font-weight: 820;
+    }
+
+    .active-label {
+      fill: var(--violet);
+    }
+
+    .sr-only {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+      border: 0;
+    }
+
+    @media (max-width: 1120px) {
+      .hero,
+      .graph-layout,
+      .two-col,
+      .comparison-layout {
+        grid-template-columns: 1fr;
+      }
+
+      .intro {
+        position: static;
+      }
+
+      h1 {
+        max-width: 15ch;
+      }
+
+      .controls {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .formula-live {
+        grid-column: 1 / -1;
+      }
+
+      .context-grid,
+      .quiz-grid,
+      .activity-grid,
+      .synthesis {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .teacher-tools {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+    }
+
+    @media (max-width: 760px) {
+      .topbar {
+        position: static;
+        align-items: flex-start;
+        flex-direction: column;
+      }
+
+      .nav {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        width: 100%;
+        justify-content: stretch;
+      }
+
+      .nav a {
+        justify-content: center;
+        padding-inline: 0.45rem;
+        text-align: center;
+        width: 100%;
+        min-width: 0;
+      }
+
+      .hero {
+        min-height: auto;
+      }
+
+      body.project-mode .hero {
+        grid-template-columns: 1fr;
+      }
+
+      .section-head {
+        flex-direction: column;
+      }
+
+      .button-row {
+        justify-content: flex-start;
+      }
+
+      .controls,
+      .readout-grid,
+      .context-grid,
+      .quiz-grid,
+      .activity-grid,
+      .field-grid,
+      .teacher-tools,
+      .synthesis {
+        grid-template-columns: 1fr;
+      }
+
+      .learning-intro {
+        grid-template-columns: 1fr;
+      }
+
+      .svg-wrap,
+      #graph {
+        min-height: 360px;
+      }
+
+      .mini-graph {
+        min-height: 280px;
+      }
+
+      .machine-row {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 520px) {
+      .topbar,
+      main {
+        width: min(100vw, 390px);
+        max-width: min(100vw, 390px);
+        margin-left: 0;
+        margin-right: 0;
+      }
+
+      .topbar {
+        padding-inline: 1rem;
+      }
+
+      h1 {
+        font-size: clamp(2.05rem, 10vw, 2.65rem);
+      }
+    }
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">
+      <span class="brand-mark" aria-hidden="true">
+        <svg width="26" height="26" viewBox="0 0 24 24" fill="none">
+          <path d="M4 18 10 9l4 5 6-9" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
+          <circle cx="4" cy="18" r="2" fill="currentColor"/>
+          <circle cx="10" cy="9" r="2" fill="currentColor"/>
+          <circle cx="14" cy="14" r="2" fill="currentColor"/>
+          <circle cx="20" cy="5" r="2" fill="currentColor"/>
+        </svg>
+      </span>
+      <div>
+        <strong>Funtzioen laborategia</strong>
+        <span>Esploratu, irudikatu, interpretatu</span>
+      </div>
+    </div>
+    <nav class="nav" aria-label="Atalak">
+      <a href="#laboratorio">Laborategia</a>
+      <a href="#ikaskuntza">Ikaskuntza</a>
+      <a href="#tabla">Taula</a>
+      <a href="#contextos">Testuinguruak</a>
+      <a href="#comprueba">Egiaztatu</a>
+    </nav>
+  </header>
+
+  <main>
+    <section class="hero">
+      <div class="intro">
+        <div>
+          <h1>Funtzioak: makinatik grafikora</h1>
+          <p class="lead">Funtzio batek <strong>x</strong> sarrera bat <strong>y</strong> irteera bihurtzen du. Makina, taula eta grafikoa ulertzen badituzu, zuzen baten atzean dagoen istorioa irakur dezakezu.</p>
+        </div>
+
+        <div class="formula-band" aria-label="Funtzioa makina gisa ulertzeko ideia">
+          <div class="machine-row">
+            <span id="machineX">x = 1</span>
+            <span aria-hidden="true">→</span>
+            <span class="machine-box">biderkatu <span id="machineM">2</span>z eta gehitu <span id="machineB">1</span></span>
+            <span aria-hidden="true">→</span>
+            <span id="machineY">y = 3</span>
+          </div>
+          <div class="big-formula" aria-label="Uneko funtzio lineala">
+            <span>y =</span>
+            <span class="m-color" id="formulaM">2</span>
+            <span>x</span>
+            <span id="formulaSign">+</span>
+            <span class="b-color" id="formulaB">1</span>
+          </div>
+          <p class="note" id="calculationText">x = 1 sartzen baduzu, makinak hau kalkulatzen du: y = 2 · 1 + 1 = 3.</p>
+        </div>
+
+        <div class="concept-list">
+          <article class="concept">
+            <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M4 19h16M5 17V5m0 12 5-7 4 3 5-8" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            <div>
+              <h3>Grafikoa mapa bat da</h3>
+              <p>Lehenik, horizontalean mugitzen zara x-ren balioraino. Gero, gora edo behera egiten duzu y-ren balioraino.</p>
+            </div>
+          </article>
+          <article class="concept">
+            <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 3v18M3 12h18M8 8h.01M16 6h.01M17 17h.01" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+            <div>
+              <h3>Bikote bakoitzak puntu bat sortzen du</h3>
+              <p>(1, 3) bikoteak hau esan nahi du: pauso 1 eskuinera eta 3 pauso gora.</p>
+            </div>
+          </article>
+          <article class="concept">
+            <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h16M8 6v12M16 6v12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+            <div>
+              <h3>Teknologiak behaketa azkartzen du</h3>
+              <p>Parametroak mugituz ereduak ikusten dituzu: igotzen den, jaisten den, non hasten den eta testuinguru errealean zer esan nahi duen.</p>
+            </div>
+          </article>
+        </div>
+      </div>
+
+      <section id="laboratorio" class="lab" aria-label="Laborategi interaktiboa">
+        <div class="panel graph-panel">
+          <div class="section-head">
+            <div>
+              <h2>Laborategi interaktiboa</h2>
+              <p>Doitu <strong>m</strong> malda, <strong>b</strong> hasierako balioa eta <strong>x</strong> sarrera. Behatu nola aldatzen diren zuzena, taula eta interpretazioa.</p>
+            </div>
+            <div class="button-row">
+              <button class="btn" type="button" id="resetBtn" title="Itzuli y = 2x + 1 funtziora">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M3 12a9 9 0 1 0 3-6.7M3 4v5h5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                Berrabiarazi
+              </button>
+              <button class="btn primary" type="button" id="pointsBtn" aria-pressed="true" title="Puntuak erakutsi edo ezkutatu">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M20 6 9 17l-5-5" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                Ikusi puntuak
+              </button>
+            </div>
+          </div>
+
+          <div class="graph-layout">
+            <div class="svg-wrap">
+              <svg id="graph" viewBox="0 0 760 520" role="img" aria-labelledby="graphTitle graphDesc">
+                <title id="graphTitle">Funtzio linealaren grafikoa</title>
+                <desc id="graphDesc">Koordenatu-sistema bat, uneko funtzio linealarekin eta kalkulatutako zenbait punturekin.</desc>
+              </svg>
+            </div>
+
+            <aside class="controls" aria-label="Funtzioaren kontrolak">
+              <div class="control">
+                <div class="control-line">
+                  <label for="mRange">Malda m</label>
+                  <span class="value-chip" id="mValue">2</span>
+                </div>
+                <input id="mRange" type="range" min="-4" max="4" step="0.25" value="2">
+              </div>
+              <div class="control">
+                <div class="control-line">
+                  <label for="bRange">Hasierako balioa b</label>
+                  <span class="value-chip" id="bValue">1</span>
+                </div>
+                <input id="bRange" type="range" min="-5" max="5" step="0.25" value="1">
+              </div>
+              <div class="control">
+                <div class="control-line">
+                  <label for="xRange">Sarrera x</label>
+                  <span class="value-chip" id="xValue">1</span>
+                </div>
+                <input id="xRange" type="range" min="-6" max="6" step="0.25" value="1">
+              </div>
+              <div class="control">
+                <div class="control-line">
+                  <label for="zoomRange">Maparen zooma</label>
+                  <span class="value-chip" id="zoomValue">6</span>
+                </div>
+                <input id="zoomRange" type="range" min="4" max="10" step="1" value="6">
+              </div>
+              <label class="check-row">
+                <input id="curveToggle" type="checkbox">
+                Kurba batekin alderatu
+              </label>
+              <div class="formula-live">
+                <span>Uneko funtzioa</span>
+                <strong id="currentFormula">y = 2x + 1</strong>
+              </div>
+            </aside>
+          </div>
+
+          <div class="readout-grid" aria-label="Funtzioaren irakurketak">
+            <article class="readout">
+              <h3>Irteera</h3>
+              <strong id="outputReadout">3</strong>
+              <p id="outputExplain">x = 1 denean, irteera y = 3 da.</p>
+            </article>
+            <article class="readout">
+              <h3>Aldaketa-erritmoa</h3>
+              <strong id="slopeReadout">+2</strong>
+              <p id="slopeExplain">x-ek 1 egiten duenean aurrera, y 2 igotzen da.</p>
+            </article>
+            <article class="readout">
+              <h3>y ardatzarekiko ebakidura</h3>
+              <strong id="interceptReadout">1</strong>
+              <p id="interceptExplain">x = 0 denean, grafikoa y = 1 balioan hasten da.</p>
+            </article>
+          </div>
+        </div>
+      </section>
+    </section>
+
+    <section class="wide-sections">
+      <section id="ikaskuntza" class="panel band learning-panel">
+        <div class="learning-intro">
+          <div>
+            <h2>Aurreikusi, probatu, azaldu</h2>
+            <p>Tresna honen helburua ez da soilik grafikoa ikustea. Ikasleak hipotesi bat egin, tresnarekin kontrastatu eta hitzez justifikatu behar du. Hor hasten da benetako ulermena.</p>
+          </div>
+          <span class="progress-pill" id="thinkingProgress">0/4 erronka osatuta</span>
+        </div>
+
+        <div class="activity-grid">
+          <article class="learning-card" aria-label="Aurreikuspen zikloa">
+            <h3>1. Aurreikusi lehenik</h3>
+            <p>Aukeratu esperimentu bat. Ez mugitu kontrolak berehala: lehenengo pentsatu zer gertatuko den.</p>
+            <label for="predictionExperiment">Esperimentua</label>
+            <select id="predictionExperiment">
+              <option value="mUp">m handitzen badut</option>
+              <option value="bDown">b txikitzen badut</option>
+              <option value="mNegative">m negatiboa bada</option>
+              <option value="mZero">m = 0 bada</option>
+            </select>
+            <p class="prompt-box" id="predictionPrompt"></p>
+            <div class="choice-grid" id="predictionChoices" aria-label="Aurreikuspen aukerak"></div>
+            <textarea id="predictionReason" rows="3" placeholder="Idatzi zergatik pentsatzen duzun hori."></textarea>
+            <div class="button-row">
+              <button class="btn primary" id="runPredictionBtn" type="button">Probatu laborategian</button>
+              <button class="btn" id="checkPredictionBtn" type="button">Egiaztatu</button>
+            </div>
+            <p class="status-box" id="predictionFeedback">Aukeratu hipotesi bat eta azaldu zure arrazoia.</p>
+          </article>
+
+          <article class="learning-card" aria-label="Akatsen laborategia">
+            <h3>2. Akatsen laborategia</h3>
+            <p>Ikasle askok antzeko akatsak egiten dituzte. Hemen akatsa aurkitu eta zuzentzea da lana.</p>
+            <p class="prompt-box" id="mistakeStatement"></p>
+            <div class="choice-grid" id="mistakeChoices" aria-label="Akats motak"></div>
+            <textarea id="mistakeCorrection" rows="3" placeholder="Nola zuzenduko zenuke?"></textarea>
+            <div class="button-row">
+              <button class="btn primary" id="checkMistakeBtn" type="button">Zuzendu</button>
+              <button class="btn" id="nextMistakeBtn" type="button">Beste akats bat</button>
+            </div>
+            <p class="status-box" id="mistakeFeedback">Irakurri esaldia eta aukeratu akatsaren iturria.</p>
+          </article>
+
+          <article class="learning-card" aria-label="Grafiko detektibea">
+            <h3>3. Grafiko-detektibea</h3>
+            <p>Formula ezkutatuta dago. Grafikoa, ebakidura eta malda erabiliz, asmatu <strong>m</strong> eta <strong>b</strong>.</p>
+            <svg class="mini-detective" id="detectiveGraph" viewBox="0 0 620 360" role="img" aria-label="Formula ezkutuko zuzen baten grafikoa"></svg>
+            <div class="field-grid">
+              <label for="guessM">m malda
+                <input id="guessM" type="number" step="0.25" inputmode="decimal">
+              </label>
+              <label for="guessB">b hasierako balioa
+                <input id="guessB" type="number" step="0.25" inputmode="decimal">
+              </label>
+            </div>
+            <div class="button-row">
+              <button class="btn primary" id="checkDetectiveBtn" type="button">Formula asmatu</button>
+              <button class="btn" id="newDetectiveBtn" type="button">Erronka berria</button>
+            </div>
+            <p class="status-box" id="detectiveFeedback">Pista: begiratu non mozten duen y ardatza eta zenbat igotzen edo jaisten den x 1 handitzean.</p>
+          </article>
+
+          <article class="learning-card" aria-label="Testuinguru sortzailea">
+            <h3>4. Zure testuingurua sortu</h3>
+            <p>Ikasleak ez du adibidea bakarrik interpretatzen: egoera bat modelizatzen du.</p>
+            <div class="micro-form">
+              <label for="modelTitle">Egoeraren izena
+                <input id="modelTitle" type="text" value="Kafetegia">
+              </label>
+              <div class="field-grid">
+                <label for="modelXName">x zer da?
+                  <input id="modelXName" type="text" value="kafe kopurua">
+                </label>
+                <label for="modelYName">y zer da?
+                  <input id="modelYName" type="text" value="prezio osoa eurotan">
+                </label>
+              </div>
+              <div class="field-grid">
+                <label for="modelM">Unitateko aldaketa m
+                  <input id="modelM" type="number" step="0.25" value="1.5">
+                </label>
+                <label for="modelB">Hasierako balioa b
+                  <input id="modelB" type="number" step="0.25" value="0.5">
+                </label>
+              </div>
+              <label for="modelExampleX">Adibideko x balioa
+                <input id="modelExampleX" type="number" step="0.25" value="4">
+              </label>
+            </div>
+            <p class="status-box" id="modelStory"></p>
+            <div class="button-row">
+              <button class="btn primary" id="applyModelBtn" type="button">Ekarri laborategira</button>
+              <button class="btn" id="copyModelBtn" type="button">Kopiatu azalpena</button>
+            </div>
+          </article>
+        </div>
+
+        <div class="teacher-tools" aria-label="Irakaslearen tresnak">
+          <label class="tool-toggle">
+            <input id="hideFormulaToggle" type="checkbox">
+            Formulak lausotu
+          </label>
+          <label class="tool-toggle">
+            <input id="projectModeToggle" type="checkbox">
+            Proiektatzeko modua
+          </label>
+          <button class="btn" id="buildSummaryBtn" type="button">Ikaslearen txostena</button>
+          <button class="btn" id="printBtn" type="button">Inprimatu</button>
+        </div>
+        <div class="teacher-summary" id="teacherSummary"></div>
+      </section>
+
+      <section id="tabla" class="panel band">
+        <div class="two-col">
+          <div>
+            <h2>Erregelatik taulara, eta taulatik puntuetara</h2>
+            <p>Taula ez da tramite hutsa: formularen eta grafikoaren arteko zubia da. Lerro bakoitzak <strong>(x, y)</strong> bikote ordenatu bat sortzen du, eta bikote ordenatu bakoitzak puntu bat.</p>
+            <ul class="steps">
+              <li>
+                <span class="step-num">1</span>
+                <div>
+                  <h3>Aukeratu x-ren balio bat</h3>
+                  <p>Adibidez, x = 2. Hori makinaren sarrera da.</p>
+                </div>
+              </li>
+              <li>
+                <span class="step-num">2</span>
+                <div>
+                  <h3>Kalkulatu y</h3>
+                  <p>y = 2x + 1 bada, orduan y = 2 · 2 + 1 = 5.</p>
+                </div>
+              </li>
+              <li>
+                <span class="step-num">3</span>
+                <div>
+                  <h3>Kokatu puntua</h3>
+                  <p>Emaitza (2, 5) idazten da: bi pauso eskuinera eta bost pauso gora.</p>
+                </div>
+              </li>
+            </ul>
+          </div>
+
+          <div class="table-panel">
+            <table>
+              <caption id="tableCaption">Uneko funtzioaren balio-taula</caption>
+              <thead>
+                <tr>
+                  <th>x</th>
+                  <th>Kalkulua</th>
+                  <th>y</th>
+                  <th>Puntua</th>
+                </tr>
+              </thead>
+              <tbody id="valueTable"></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <section id="contextos" class="panel band">
+        <div class="two-col">
+          <div>
+            <h2>Grafikoak istorio bat kontatzen du</h2>
+            <p>Grafiko bat interpretatzea zenbakiak esanahira itzultzea da. <strong>y = mx + b</strong> zuzen batean, <strong>b</strong> hasierako kantitatea izan ohi da, eta <strong>m</strong>-k adierazten du emaitza zenbat aldatzen den x unitate batean handitzen den bakoitzean.</p>
+            <div class="context-grid" id="contextGrid" aria-label="Bizitza errealeko adibideak"></div>
+          </div>
+          <aside class="story-box" aria-live="polite">
+            <h3 id="storyTitle">Taxi</h3>
+            <p id="storyText"></p>
+            <p><span class="story-equation" id="storyFormula">y = 2x + 3</span></p>
+            <p id="storyExample"></p>
+            <button class="btn primary" id="applyStoryBtn" type="button">Adibide hau laborategian erabili</button>
+          </aside>
+        </div>
+      </section>
+
+      <section class="panel band">
+        <div class="comparison-layout">
+          <div>
+            <h2>Igo, jaitsi, zuzena edo kurba</h2>
+            <p>Grafiko bat aztertzea haren portaera behatzea da. Zuzen bat beti erritmo berean aldatzen da; kurba bat, berriz, gero eta azkarrago edo gero eta motelago alda daiteke.</p>
+            <svg class="mini-graph" id="comparisonGraph" viewBox="0 0 620 360" role="img" aria-label="Grafiko mota desberdinen arteko alderaketa"></svg>
+          </div>
+          <div class="segmented" id="comparisonButtons" aria-label="Erlazio motak">
+            <button type="button" data-kind="increasing" aria-pressed="true">Erlazio gorakorra: ordu gehiago, diru gehiago</button>
+            <button type="button" data-kind="decreasing" aria-pressed="false">Erlazio beherakorra: abiadura handiagoa, denbora gutxiago</button>
+            <button type="button" data-kind="constant" aria-pressed="false">Erlazio konstantea: kuota finkoa</button>
+            <button type="button" data-kind="curved" aria-pressed="false">Erlazio kurbatua: hazkunde azeleratua</button>
+          </div>
+        </div>
+      </section>
+
+      <section id="comprueba" class="panel band">
+        <h2>Egiaztatu ulertu duzun</h2>
+        <p>Erantzun laborategian une honetan duzun funtzioa erabiliz. Malda edo hasierako balioa aldatzen baduzu, erantzun zuzenak ere aldatuko dira.</p>
+        <div class="quiz-grid">
+          <article class="quiz-item">
+            <h3>1. Hasierako balioa</h3>
+            <p>Uneko funtzioan, zenbat balio du <strong>b</strong>-k?</p>
+            <div class="answer-line">
+              <input id="answerB" type="number" step="0.25" aria-label="Hasierako balioaren erantzuna">
+              <button class="btn" type="button" data-check="b">Zuzendu</button>
+            </div>
+            <p class="feedback" id="feedbackB">Laguntza: begiratu zuzenak non mozten duen y ardatza.</p>
+          </article>
+          <article class="quiz-item">
+            <h3>2. Malda</h3>
+            <p>x unitate 1 handitzen bada, zenbat aldatzen da y?</p>
+            <div class="answer-line">
+              <input id="answerM" type="number" step="0.25" aria-label="Maldaren erantzuna">
+              <button class="btn" type="button" data-check="m">Zuzendu</button>
+            </div>
+            <p class="feedback" id="feedbackM">Laguntza: zenbaki hori m malda da.</p>
+          </article>
+          <article class="quiz-item">
+            <h3>3. Kalkulua</h3>
+            <p id="questionY">x = 4 denean, zenbat balio du y-k?</p>
+            <div class="answer-line">
+              <input id="answerY" type="number" step="0.25" aria-label="y kalkulatzeko erantzuna">
+              <button class="btn" type="button" data-check="y">Zuzendu</button>
+            </div>
+            <p class="feedback" id="feedbackY">Laguntza: ordezkatu x formularen barruan.</p>
+          </article>
+        </div>
+        <div class="teacher-note">
+          <strong>Koadernoan ixteko esaldia:</strong>
+          <span id="closingSentence">Funtzio batek sarrerak irteera bihurtzen ditu; haren grafikoak erakusten du erlazioa hazten den, jaisten den, hasierako balio batean hasten den edo erritmoa aldatzen duen.</span>
+        </div>
+      </section>
+
+      <section class="synthesis" aria-label="Sintesia">
+        <article>
+          <h3>1. Funtzioa</h3>
+          <p>x sarrera bakoitzari y irteera bat esleitzen dion erregela.</p>
+        </article>
+        <article>
+          <h3>2. Puntua</h3>
+          <p>(x, y) bikote bat: lehenik horizontalean, gero bertikalean.</p>
+        </article>
+        <article>
+          <h3>3. Malda</h3>
+          <p>x unitate bat handitzen denean y zenbat aldatzen den.</p>
+        </article>
+        <article>
+          <h3>4. Hasierako balioa</h3>
+          <p>x = 0 denean y-k duen balioa; grafikoan y ardatzarekiko ebakidura da.</p>
+        </article>
+        <article>
+          <h3>5. Interpretatzea</h3>
+          <p>Erregelak, taulak eta grafikoak zer esan nahi duten hitzez azaltzea.</p>
+        </article>
+      </section>
+    </section>
+
+    <p class="footer">Esperimentatzeko egina: mugitu, behatu, azaldu eta berriro probatu.</p>
+  </main>
+
+  <script>
+    const graph = document.querySelector("#graph");
+    const comparisonGraph = document.querySelector("#comparisonGraph");
+    const mRange = document.querySelector("#mRange");
+    const bRange = document.querySelector("#bRange");
+    const xRange = document.querySelector("#xRange");
+    const zoomRange = document.querySelector("#zoomRange");
+    const pointsBtn = document.querySelector("#pointsBtn");
+    const resetBtn = document.querySelector("#resetBtn");
+    const curveToggle = document.querySelector("#curveToggle");
+    const valueTable = document.querySelector("#valueTable");
+    const contextGrid = document.querySelector("#contextGrid");
+    const comparisonButtons = document.querySelector("#comparisonButtons");
+    const predictionExperiment = document.querySelector("#predictionExperiment");
+    const predictionChoices = document.querySelector("#predictionChoices");
+    const mistakeChoices = document.querySelector("#mistakeChoices");
+    const detectiveGraph = document.querySelector("#detectiveGraph");
+
+    const els = {
+      mValue: document.querySelector("#mValue"),
+      bValue: document.querySelector("#bValue"),
+      xValue: document.querySelector("#xValue"),
+      zoomValue: document.querySelector("#zoomValue"),
+      formulaM: document.querySelector("#formulaM"),
+      formulaSign: document.querySelector("#formulaSign"),
+      formulaB: document.querySelector("#formulaB"),
+      machineM: document.querySelector("#machineM"),
+      machineB: document.querySelector("#machineB"),
+      machineX: document.querySelector("#machineX"),
+      machineY: document.querySelector("#machineY"),
+      calculationText: document.querySelector("#calculationText"),
+      currentFormula: document.querySelector("#currentFormula"),
+      outputReadout: document.querySelector("#outputReadout"),
+      outputExplain: document.querySelector("#outputExplain"),
+      slopeReadout: document.querySelector("#slopeReadout"),
+      slopeExplain: document.querySelector("#slopeExplain"),
+      interceptReadout: document.querySelector("#interceptReadout"),
+      interceptExplain: document.querySelector("#interceptExplain"),
+      storyTitle: document.querySelector("#storyTitle"),
+      storyText: document.querySelector("#storyText"),
+      storyFormula: document.querySelector("#storyFormula"),
+      storyExample: document.querySelector("#storyExample"),
+      questionY: document.querySelector("#questionY"),
+      thinkingProgress: document.querySelector("#thinkingProgress"),
+      predictionPrompt: document.querySelector("#predictionPrompt"),
+      predictionReason: document.querySelector("#predictionReason"),
+      predictionFeedback: document.querySelector("#predictionFeedback"),
+      mistakeStatement: document.querySelector("#mistakeStatement"),
+      mistakeCorrection: document.querySelector("#mistakeCorrection"),
+      mistakeFeedback: document.querySelector("#mistakeFeedback"),
+      guessM: document.querySelector("#guessM"),
+      guessB: document.querySelector("#guessB"),
+      detectiveFeedback: document.querySelector("#detectiveFeedback"),
+      modelTitle: document.querySelector("#modelTitle"),
+      modelXName: document.querySelector("#modelXName"),
+      modelYName: document.querySelector("#modelYName"),
+      modelM: document.querySelector("#modelM"),
+      modelB: document.querySelector("#modelB"),
+      modelExampleX: document.querySelector("#modelExampleX"),
+      modelStory: document.querySelector("#modelStory"),
+      hideFormulaToggle: document.querySelector("#hideFormulaToggle"),
+      projectModeToggle: document.querySelector("#projectModeToggle"),
+      teacherSummary: document.querySelector("#teacherSummary")
+    };
+
+    const contexts = [
+      {
+        id: "taxi",
+        title: "Taxi",
+        m: 2,
+        b: 3,
+        xName: "kilometro kopurua",
+        yName: "prezio osoa eurotan",
+        text: "Taxiak 3 euro kobratzen ditu hasieran eta 2 euro egindako kilometro bakoitzeko.",
+        exampleX: 5,
+        unit: "euro"
+      },
+      {
+        id: "pan",
+        title: "Okindegia",
+        m: 2,
+        b: 1,
+        xName: "ogi barra kopurua",
+        yName: "prezio osoa eurotan",
+        text: "Poltsa batek 1 euro balio du eta ogi barra bakoitzak 2 euro gehitzen ditu.",
+        exampleX: 3,
+        unit: "euro"
+      },
+      {
+        id: "ahorro",
+        title: "Aurrezkia",
+        m: 1,
+        b: 4,
+        xName: "aste kopurua",
+        yName: "aurreztutako dirua eurotan",
+        text: "Dagoeneko 4 euro dituzu eta aste bakoitzean euro 1 aurrezten duzu.",
+        exampleX: 6,
+        unit: "euro"
+      },
+      {
+        id: "deposito",
+        title: "Husten den biltegia",
+        m: -0.5,
+        b: 5,
+        xName: "minutu kopurua",
+        yName: "ur litro kopurua",
+        text: "Biltegi batek 5 litro ditu eta minutu bakoitzean litro erdi galtzen du.",
+        exampleX: 6,
+        unit: "litro"
+      }
+    ];
+
+    const predictionTasks = {
+      mUp: {
+        prompt: "Uneko funtzioan m handiagoa jarriko dugu. Zer gertatuko da grafikoarekin?",
+        choices: [
+          { id: "steeper", text: "Zuzenak inklinazio handiagoa izango du" },
+          { id: "sameIntercept", text: "y ardatzeko ebakidura ez da aldatuko" },
+          { id: "both", text: "Bi gauzak gertatuko dira" },
+          { id: "nothing", text: "Ez da ezer aldatuko" }
+        ],
+        correct: "both",
+        apply: () => {
+          state.m = Math.min(4, state.m + 1);
+        },
+        explanation: "m maldak zuzenaren inklinazioa aldatzen du. b bera mantentzen bada, y ardatzeko ebakidura ez da mugitzen."
+      },
+      bDown: {
+        prompt: "b txikitzen badugu eta m berdin uzten badugu, zer aldatuko da?",
+        choices: [
+          { id: "parallel", text: "Zuzena paralelo mugituko da behera" },
+          { id: "slope", text: "Malda aldatuko da" },
+          { id: "curve", text: "Zuzena kurba bihurtuko da" },
+          { id: "none", text: "Taula bakarrik aldatuko da" }
+        ],
+        correct: "parallel",
+        apply: () => {
+          state.b = Math.max(-5, state.b - 2);
+        },
+        explanation: "b hasierako balioa da. Aldatzean zuzen osoa gora edo behera mugitzen da, baina m malda ez bada aldatzen, zuzenak paralelo jarraitzen du."
+      },
+      mNegative: {
+        prompt: "m negatiboa jartzen badugu, zer esan nahi du testuinguru batean?",
+        choices: [
+          { id: "decreases", text: "x handitzean y txikitzen dela" },
+          { id: "below", text: "Grafikoa beti x ardatzaren azpian dagoela" },
+          { id: "zero", text: "y beti 0 dela" },
+          { id: "intercept", text: "b ere negatiboa dela" }
+        ],
+        correct: "decreases",
+        apply: () => {
+          state.m = -Math.max(0.5, Math.abs(state.m));
+        },
+        explanation: "m negatiboak beheranzko erlazioa adierazten du: x handitu ahala, y txikitu egiten da. Ez du esan nahi grafikoa beti azpian dagoenik."
+      },
+      mZero: {
+        prompt: "m = 0 bada, zer gertatzen da x-ren balioak aldatzean?",
+        choices: [
+          { id: "constant", text: "y konstante mantentzen da" },
+          { id: "vertical", text: "Zuzena bertikala da" },
+          { id: "noFunction", text: "Ez da funtzioa" },
+          { id: "samePoint", text: "Puntu bakarra dago" }
+        ],
+        correct: "constant",
+        apply: () => {
+          state.m = 0;
+        },
+        explanation: "m = 0 denean, y = b da x guztientzat. Grafikoa zuzena horizontala da."
+      }
+    };
+
+    const mistakeTasks = [
+      {
+        statement: "Ikasle batek dio: 'b da zuzenak x ardatza mozten duen puntua'.",
+        choices: [
+          { id: "intercept", text: "Ebakidura nahastu du" },
+          { id: "slope", text: "Malda nahastu du" },
+          { id: "pointOrder", text: "Puntuaren ordena aldatu du" },
+          { id: "calculation", text: "Kalkulua gaizki egin du" }
+        ],
+        correct: "intercept",
+        explanation: "b y ardatzarekiko ebakidura da, hau da, x = 0 denean y-k duen balioa."
+      },
+      {
+        statement: "Ikasle batek dio: 'm negatiboa bada, grafikoa beti x ardatzaren azpian dago'.",
+        choices: [
+          { id: "slope", text: "Malda eta posizioa nahastu ditu" },
+          { id: "intercept", text: "b bakarrik falta zaio" },
+          { id: "table", text: "Taula falta zaio" },
+          { id: "units", text: "Unitateak nahastu ditu" }
+        ],
+        correct: "slope",
+        explanation: "m negatiboak joera beherakorra adierazten du. Grafikoa goian edo behean egotea b-ren eta x-ren araberakoa da."
+      },
+      {
+        statement: "Ikasle batek (3, 1) idatzi du x = 1 eta y = 3 lortu ondoren.",
+        choices: [
+          { id: "pointOrder", text: "Koordenatuen ordena alderantzikatu du" },
+          { id: "slope", text: "Malda gaizki irakurri du" },
+          { id: "intercept", text: "Hasierako balioa gaizki hartu du" },
+          { id: "model", text: "Testuingurua falta da" }
+        ],
+        correct: "pointOrder",
+        explanation: "Puntuak beti (x, y) ordenan idazten dira. Beraz, x = 1 eta y = 3 bada, puntua (1, 3) da."
+      }
+    ];
+
+    const detectiveChallenges = [
+      { m: 2, b: 1 },
+      { m: -1, b: 3 },
+      { m: 0.5, b: -2 },
+      { m: -1.5, b: 4 },
+      { m: 3, b: -1 },
+      { m: 0, b: 2 }
+    ];
+
+    const completedChallenges = new Set();
+    let selectedPrediction = "";
+    let selectedMistake = "";
+    let currentMistakeIndex = 0;
+    let detectiveIndex = 1;
+
+    const state = {
+      m: 2,
+      b: 1,
+      x: 1,
+      zoom: 6,
+      showPoints: true,
+      showCurve: false,
+      context: contexts[0],
+      comparison: "increasing"
+    };
+
+    const svgNS = "http://www.w3.org/2000/svg";
+    const plot = { width: 760, height: 520, left: 48, right: 22, top: 22, bottom: 44 };
+    const mini = { width: 620, height: 360, left: 44, right: 20, top: 22, bottom: 36 };
+
+    function makeSvg(tag, attrs = {}) {
+      const node = document.createElementNS(svgNS, tag);
+      Object.entries(attrs).forEach(([key, value]) => node.setAttribute(key, value));
+      return node;
+    }
+
+    function formatNumber(value) {
+      if (!Number.isFinite(value)) return "-";
+      const rounded = Math.round(value * 100) / 100;
+      return Object.is(rounded, -0) ? "0" : String(rounded);
+    }
+
+    function signed(value) {
+      if (value < 0) return "- " + formatNumber(Math.abs(value));
+      return "+ " + formatNumber(value);
+    }
+
+    function formulaText(m = state.m, b = state.b) {
+      const mText = m === 1 ? "x" : m === -1 ? "-x" : formatNumber(m) + "x";
+      if (b === 0) return "y = " + mText;
+      return "y = " + mText + " " + signed(b);
+    }
+
+    function yValue(x, m = state.m, b = state.b) {
+      return m * x + b;
+    }
+
+    function setRangesFromState() {
+      mRange.value = Math.max(-4, Math.min(4, state.m));
+      bRange.value = Math.max(-5, Math.min(5, state.b));
+      xRange.value = Math.max(-6, Math.min(6, state.x));
+      zoomRange.value = state.zoom;
+      curveToggle.checked = state.showCurve;
+    }
+
+    function getScale(bounds, dims) {
+      const xMin = -bounds;
+      const xMax = bounds;
+      const yMin = -bounds;
+      const yMax = bounds;
+      const w = dims.width - dims.left - dims.right;
+      const h = dims.height - dims.top - dims.bottom;
+      return {
+        xMin,
+        xMax,
+        yMin,
+        yMax,
+        x: value => dims.left + ((value - xMin) / (xMax - xMin)) * w,
+        y: value => dims.top + ((yMax - value) / (yMax - yMin)) * h
+      };
+    }
+
+    function addGrid(svg, scale, dims, bounds) {
+      const grid = makeSvg("g", { "aria-hidden": "true" });
+      for (let i = -bounds; i <= bounds; i += 1) {
+        const x = scale.x(i);
+        const y = scale.y(i);
+        grid.appendChild(makeSvg("line", { x1: x, y1: dims.top, x2: x, y2: dims.height - dims.bottom, stroke: "var(--grid)", "stroke-width": i === 0 ? 0 : 1, "stroke-dasharray": "2 3" }));
+        grid.appendChild(makeSvg("line", { x1: dims.left, y1: y, x2: dims.width - dims.right, y2: y, stroke: "var(--grid)", "stroke-width": i === 0 ? 0 : 1, "stroke-dasharray": "2 3" }));
+      }
+      const axis = makeSvg("g", { "aria-hidden": "true" });
+      axis.appendChild(makeSvg("line", { x1: dims.left, y1: scale.y(0), x2: dims.width - dims.right, y2: scale.y(0), stroke: "#152638", "stroke-width": 1.4 }));
+      axis.appendChild(makeSvg("line", { x1: scale.x(0), y1: dims.top, x2: scale.x(0), y2: dims.height - dims.bottom, stroke: "#152638", "stroke-width": 1.4 }));
+      axis.appendChild(makeSvg("path", { d: `M${dims.width - dims.right - 7} ${scale.y(0) - 4} L${dims.width - dims.right} ${scale.y(0)} L${dims.width - dims.right - 7} ${scale.y(0) + 4}`, fill: "#152638" }));
+      axis.appendChild(makeSvg("path", { d: `M${scale.x(0) - 4} ${dims.top + 7} L${scale.x(0)} ${dims.top} L${scale.x(0) + 4} ${dims.top + 7}`, fill: "#152638" }));
+      axis.appendChild(makeSvg("text", { x: dims.width - dims.right - 1, y: scale.y(0) - 10, class: "axis-label" })).textContent = "x";
+      axis.appendChild(makeSvg("text", { x: scale.x(0) + 9, y: dims.top + 12, class: "axis-label" })).textContent = "y";
+      for (let i = -bounds; i <= bounds; i += 1) {
+        if (i === 0) continue;
+        const tx = makeSvg("text", { x: scale.x(i), y: scale.y(0) + 18, "text-anchor": "middle", class: "tick-label" });
+        tx.textContent = i;
+        axis.appendChild(tx);
+        const ty = makeSvg("text", { x: scale.x(0) - 10, y: scale.y(i) + 4, "text-anchor": "end", class: "tick-label" });
+        ty.textContent = i;
+        axis.appendChild(ty);
+      }
+      svg.appendChild(grid);
+      svg.appendChild(axis);
+    }
+
+    function pathFromFunction(scale, bounds, fn, samples = 260) {
+      let d = "";
+      let started = false;
+      for (let i = 0; i <= samples; i += 1) {
+        const x = -bounds + (2 * bounds * i) / samples;
+        const y = fn(x);
+        if (!Number.isFinite(y) || y < -bounds * 1.35 || y > bounds * 1.35) {
+          started = false;
+          continue;
+        }
+        const px = scale.x(x);
+        const py = scale.y(y);
+        d += `${started ? "L" : "M"}${px.toFixed(2)} ${py.toFixed(2)} `;
+        started = true;
+      }
+      return d;
+    }
+
+    function drawPoint(svg, scale, x, y, color, label, active = false) {
+      const px = scale.x(x);
+      const py = scale.y(y);
+      svg.appendChild(makeSvg("circle", { cx: px, cy: py, r: active ? 7 : 5, fill: color, stroke: "white", "stroke-width": 2 }));
+      const text = makeSvg("text", { x: px + 10, y: py - 10, class: active ? "graph-label active-label" : "graph-label" });
+      text.textContent = label;
+      svg.appendChild(text);
+    }
+
+    function renderGraph() {
+      graph.textContent = "";
+      const bounds = Number(state.zoom);
+      const scale = getScale(bounds, plot);
+      addGrid(graph, scale, plot, bounds);
+
+      const linePath = pathFromFunction(scale, bounds, x => yValue(x), 260);
+      graph.appendChild(makeSvg("path", { d: linePath, fill: "none", stroke: "var(--teal)", "stroke-width": 3.2, "stroke-linecap": "round" }));
+
+      if (state.showCurve) {
+        const curvePath = pathFromFunction(scale, bounds, x => (x * x) / 2 - 1, 300);
+        graph.appendChild(makeSvg("path", { d: curvePath, fill: "none", stroke: "var(--violet)", "stroke-width": 2.6, "stroke-dasharray": "8 7", "stroke-linecap": "round" }));
+        const label = makeSvg("text", { x: scale.x(Math.min(bounds - 2, 3)), y: scale.y(((Math.min(bounds - 2, 3) ** 2) / 2) - 1) - 10, class: "graph-label active-label" });
+        label.textContent = "kurba: y = x²/2 - 1";
+        graph.appendChild(label);
+      }
+
+      if (state.showPoints) {
+        [-2, -1, 0, 1, 2, 3].forEach(sampleX => {
+          const sampleY = yValue(sampleX);
+          if (sampleY >= -bounds && sampleY <= bounds) {
+            const color = sampleX === 0 ? "var(--red)" : "var(--blue)";
+            drawPoint(graph, scale, sampleX, sampleY, color, `(${formatNumber(sampleX)}, ${formatNumber(sampleY)})`);
+          }
+        });
+      }
+
+      const activeY = yValue(state.x);
+      if (activeY >= -bounds && activeY <= bounds) {
+        graph.appendChild(makeSvg("line", { x1: scale.x(state.x), y1: scale.y(0), x2: scale.x(state.x), y2: scale.y(activeY), stroke: "var(--violet)", "stroke-width": 2, "stroke-dasharray": "5 5" }));
+        graph.appendChild(makeSvg("line", { x1: scale.x(0), y1: scale.y(activeY), x2: scale.x(state.x), y2: scale.y(activeY), stroke: "var(--violet)", "stroke-width": 2, "stroke-dasharray": "5 5" }));
+        drawPoint(graph, scale, state.x, activeY, "var(--violet)", `x = ${formatNumber(state.x)}, y = ${formatNumber(activeY)}`, true);
+      }
+    }
+
+    function renderTable() {
+      valueTable.textContent = "";
+      [-2, -1, 0, 1, 2, 3].forEach(x => {
+        const y = yValue(x);
+        const row = document.createElement("tr");
+        if (Math.abs(x - state.x) < 0.001 || (state.m === 2 && state.b === 1 && [0, 1, 2].includes(x))) {
+          row.classList.add("highlight-row");
+        }
+        [formatNumber(x), `${formatNumber(state.m)} · ${formatNumber(x)} ${signed(state.b)}`, formatNumber(y), `(${formatNumber(x)}, ${formatNumber(y)})`].forEach(text => {
+          const cell = document.createElement("td");
+          cell.textContent = text;
+          row.appendChild(cell);
+        });
+        valueTable.appendChild(row);
+      });
+    }
+
+    function renderReadouts() {
+      const y = yValue(state.x);
+      els.mValue.textContent = formatNumber(state.m);
+      els.bValue.textContent = formatNumber(state.b);
+      els.xValue.textContent = formatNumber(state.x);
+      els.zoomValue.textContent = formatNumber(state.zoom);
+      els.currentFormula.textContent = formulaText();
+      els.formulaM.textContent = state.m === 1 ? "" : state.m === -1 ? "-" : formatNumber(state.m);
+      els.formulaSign.textContent = state.b < 0 ? "-" : "+";
+      els.formulaB.textContent = formatNumber(Math.abs(state.b));
+      els.machineM.textContent = formatNumber(state.m);
+      els.machineB.textContent = formatNumber(state.b);
+      els.machineX.textContent = "x = " + formatNumber(state.x);
+      els.machineY.textContent = "y = " + formatNumber(y);
+      els.calculationText.textContent = `x = ${formatNumber(state.x)} sartzen baduzu, makinak hau kalkulatzen du: y = ${formatNumber(state.m)} · ${formatNumber(state.x)} ${signed(state.b)} = ${formatNumber(y)}.`;
+      els.outputReadout.textContent = formatNumber(y);
+      els.outputExplain.textContent = `x = ${formatNumber(state.x)} denean, irteera y = ${formatNumber(y)} da. Puntu hori (${formatNumber(state.x)}, ${formatNumber(y)}) da.`;
+      els.slopeReadout.textContent = state.m > 0 ? "+" + formatNumber(state.m) : formatNumber(state.m);
+      if (state.m > 0) {
+        els.slopeExplain.textContent = `Zuzena igotzen da: x-ek 1 egiten duen bakoitzean, y ${formatNumber(state.m)} handitzen da.`;
+      } else if (state.m < 0) {
+        els.slopeExplain.textContent = `Zuzena jaisten da: x-ek 1 egiten duen bakoitzean, y ${formatNumber(Math.abs(state.m))} txikitzen da.`;
+      } else {
+        els.slopeExplain.textContent = "Zuzena horizontala da: x aldatzen bada ere, y konstante mantentzen da.";
+      }
+      els.interceptReadout.textContent = formatNumber(state.b);
+      els.interceptExplain.textContent = `x = 0 denean, y = ${formatNumber(state.b)}. Hori y ardatzarekiko ebakidura da.`;
+      els.questionY.textContent = `x = ${formatNumber(state.x)} denean, zenbat balio du y-k?`;
+      document.querySelector("#closingSentence").textContent = closingText();
+    }
+
+    function closingText() {
+      const trend = state.m > 0 ? "gorakorra" : state.m < 0 ? "beherakorra" : "konstantea";
+      return `${formulaText()} funtzioak erlazio ${trend} adierazten du: x = 0 denean ${formatNumber(state.b)} balioan hasten da, eta x-ren unitate bakoitzeko y ${formatNumber(state.m)} unitate aldatzen da.`;
+    }
+
+    function renderContexts() {
+      contextGrid.textContent = "";
+      contexts.forEach(item => {
+        const button = document.createElement("button");
+        button.type = "button";
+        button.className = "context-button";
+        button.setAttribute("aria-pressed", String(state.context.id === item.id));
+        button.dataset.context = item.id;
+        button.innerHTML = `<strong>${item.title}</strong><span>${item.text}</span>`;
+        contextGrid.appendChild(button);
+      });
+      renderStory();
+    }
+
+    function renderStory() {
+      const item = state.context;
+      const exampleY = yValue(item.exampleX, item.m, item.b);
+      els.storyTitle.textContent = item.title;
+      els.storyText.textContent = `${item.text} Hemen x-k ${item.xName} adierazten du, eta y-k ${item.yName}.`;
+      els.storyFormula.textContent = formulaText(item.m, item.b);
+      els.storyExample.textContent = `Adibidez, x = ${formatNumber(item.exampleX)} bada, orduan y = ${formatNumber(item.m)} · ${formatNumber(item.exampleX)} ${signed(item.b)} = ${formatNumber(exampleY)} ${item.unit}.`;
+    }
+
+    function renderComparison() {
+      comparisonGraph.textContent = "";
+      const scale = getScale(6, mini);
+      addGrid(comparisonGraph, scale, mini, 6);
+      const settings = {
+        increasing: { fn: x => 0.8 * x + 0.5, color: "var(--teal)", label: "igotzen da: y handitzen da" },
+        decreasing: { fn: x => -0.75 * x + 1.5, color: "var(--amber)", label: "jaisten da: y txikitzen da" },
+        constant: { fn: () => 2, color: "var(--green)", label: "konstantea: y ez da aldatzen" },
+        curved: { fn: x => (x * x) / 4 - 2, color: "var(--violet)", label: "kurba: erritmoa aldatzen da" }
+      };
+      const current = settings[state.comparison];
+      comparisonGraph.appendChild(makeSvg("path", { d: pathFromFunction(scale, 6, current.fn, 220), fill: "none", stroke: current.color, "stroke-width": 3.2, "stroke-linecap": "round" }));
+      const text = makeSvg("text", { x: mini.left + 14, y: mini.top + 24, class: "graph-label" });
+      text.textContent = current.label;
+      comparisonGraph.appendChild(text);
+    }
+
+    function setStatus(element, text, type = "") {
+      element.textContent = text;
+      element.classList.remove("ok", "no");
+      if (type) element.classList.add(type);
+    }
+
+    function markCompleted(id) {
+      completedChallenges.add(id);
+      els.thinkingProgress.textContent = `${completedChallenges.size}/4 erronka osatuta`;
+    }
+
+    function renderPrediction() {
+      const task = predictionTasks[predictionExperiment.value];
+      selectedPrediction = "";
+      els.predictionPrompt.textContent = task.prompt;
+      predictionChoices.textContent = "";
+      task.choices.forEach(choice => {
+        const button = document.createElement("button");
+        button.type = "button";
+        button.className = "choice-button";
+        button.dataset.choice = choice.id;
+        button.setAttribute("aria-pressed", "false");
+        button.textContent = choice.text;
+        predictionChoices.appendChild(button);
+      });
+      setStatus(els.predictionFeedback, "Aukeratu hipotesi bat eta azaldu zure arrazoia.");
+    }
+
+    function renderMistake() {
+      const task = mistakeTasks[currentMistakeIndex];
+      selectedMistake = "";
+      els.mistakeStatement.textContent = task.statement;
+      els.mistakeCorrection.value = "";
+      mistakeChoices.textContent = "";
+      task.choices.forEach(choice => {
+        const button = document.createElement("button");
+        button.type = "button";
+        button.className = "choice-button";
+        button.dataset.choice = choice.id;
+        button.setAttribute("aria-pressed", "false");
+        button.textContent = choice.text;
+        mistakeChoices.appendChild(button);
+      });
+      setStatus(els.mistakeFeedback, "Irakurri esaldia eta aukeratu akatsaren iturria.");
+    }
+
+    function renderDetectiveGraph() {
+      const challenge = detectiveChallenges[detectiveIndex];
+      detectiveGraph.textContent = "";
+      const scale = getScale(6, mini);
+      addGrid(detectiveGraph, scale, mini, 6);
+      detectiveGraph.appendChild(makeSvg("path", {
+        d: pathFromFunction(scale, 6, x => yValue(x, challenge.m, challenge.b), 240),
+        fill: "none",
+        stroke: "var(--teal)",
+        "stroke-width": 3.2,
+        "stroke-linecap": "round"
+      }));
+      drawPoint(detectiveGraph, scale, 0, challenge.b, "var(--red)", `(0, ${formatNumber(challenge.b)})`);
+      const x2 = challenge.m === 0 ? 2 : 1;
+      drawPoint(detectiveGraph, scale, x2, yValue(x2, challenge.m, challenge.b), "var(--blue)", "beste puntu bat");
+      const label = makeSvg("text", { x: mini.left + 14, y: mini.top + 24, class: "graph-label" });
+      label.textContent = "formula ezkutua";
+      detectiveGraph.appendChild(label);
+      setStatus(els.detectiveFeedback, "Pista: begiratu non mozten duen y ardatza eta zenbat igotzen edo jaisten den x 1 handitzean.");
+    }
+
+    function renderModelStory() {
+      const title = els.modelTitle.value.trim() || "Nire egoera";
+      const xName = els.modelXName.value.trim() || "x";
+      const yName = els.modelYName.value.trim() || "y";
+      const m = Number(els.modelM.value);
+      const b = Number(els.modelB.value);
+      const exampleX = Number(els.modelExampleX.value);
+      if (![m, b, exampleX].every(Number.isFinite)) {
+        setStatus(els.modelStory, "Sartu zenbakizko balio koherenteak m, b eta x eremuetan.", "no");
+        return;
+      }
+      const exampleY = yValue(exampleX, m, b);
+      setStatus(
+        els.modelStory,
+        `${title}: x-k ${xName} adierazten du eta y-k ${yName}. Eredua ${formulaText(m, b)} da. x = ${formatNumber(exampleX)} denean, y = ${formatNumber(exampleY)}.`,
+        "ok"
+      );
+    }
+
+    function buildStudentSummary() {
+      const predictionText = els.predictionReason.value.trim() || "Aurreikuspenaren azalpena oraindik idatzi gabe.";
+      const modelText = els.modelStory.textContent.trim() || "Testuinguru propioa oraindik sortu gabe.";
+      els.teacherSummary.textContent =
+        `Ikaslearen txostena\n\n` +
+        `1. Uneko funtzioa: ${formulaText()}\n` +
+        `2. Irakurketa: x = ${formatNumber(state.x)} denean, y = ${formatNumber(yValue(state.x))}.\n` +
+        `3. Aurreikuspenaren arrazoia: ${predictionText}\n` +
+        `4. Testuinguru propioa: ${modelText}\n` +
+        `5. Egiaztatzeko galdera: azaldu zer diren m eta b egoera horretan.`;
+      els.teacherSummary.classList.add("is-visible");
+    }
+
+    function updateAll() {
+      setRangesFromState();
+      renderGraph();
+      renderTable();
+      renderReadouts();
+      renderContexts();
+      renderComparison();
+    }
+
+    function nearly(a, b) {
+      return Math.abs(Number(a) - Number(b)) < 0.001;
+    }
+
+    function checkAnswer(kind) {
+      const map = {
+        b: { input: "#answerB", feedback: "#feedbackB", value: state.b, ok: "Primeran: b hasierako balioa da, y ardatzarekiko ebakidura." },
+        m: { input: "#answerM", feedback: "#feedbackM", value: state.m, ok: "Ongi ikusita: m-k adierazten du y zenbat aldatzen den x 1 handitzean." },
+        y: { input: "#answerY", feedback: "#feedbackY", value: yValue(state.x), ok: "Zuzen: x funtzioaren erregelan ordezkatu duzu." }
+      };
+      const item = map[kind];
+      const input = document.querySelector(item.input);
+      const feedback = document.querySelector(item.feedback);
+      feedback.classList.remove("ok", "no");
+      if (input.value === "") {
+        feedback.textContent = "Idatzi erantzun bat zuzendu aurretik.";
+        feedback.classList.add("no");
+        return;
+      }
+      if (nearly(input.value, item.value)) {
+        feedback.textContent = item.ok;
+        feedback.classList.add("ok");
+      } else {
+        feedback.textContent = `Berrikusi ${formulaText()} erregela. Erantzun zuzena ${formatNumber(item.value)} da.`;
+        feedback.classList.add("no");
+      }
+    }
+
+    [mRange, bRange, xRange, zoomRange].forEach(input => {
+      input.addEventListener("input", () => {
+        state.m = Number(mRange.value);
+        state.b = Number(bRange.value);
+        state.x = Number(xRange.value);
+        state.zoom = Number(zoomRange.value);
+        updateAll();
+      });
+    });
+
+    curveToggle.addEventListener("change", () => {
+      state.showCurve = curveToggle.checked;
+      updateAll();
+    });
+
+    pointsBtn.addEventListener("click", () => {
+      state.showPoints = !state.showPoints;
+      pointsBtn.setAttribute("aria-pressed", String(state.showPoints));
+      pointsBtn.classList.toggle("primary", state.showPoints);
+      updateAll();
+    });
+
+    resetBtn.addEventListener("click", () => {
+      state.m = 2;
+      state.b = 1;
+      state.x = 1;
+      state.zoom = 6;
+      state.showCurve = false;
+      updateAll();
+    });
+
+    contextGrid.addEventListener("click", event => {
+      const button = event.target.closest("button[data-context]");
+      if (!button) return;
+      state.context = contexts.find(item => item.id === button.dataset.context) || contexts[0];
+      renderContexts();
+    });
+
+    document.querySelector("#applyStoryBtn").addEventListener("click", () => {
+      state.m = state.context.m;
+      state.b = state.context.b;
+      state.x = Math.min(6, Math.max(-6, state.context.exampleX));
+      state.zoom = Math.max(6, Math.min(10, Math.ceil(Math.max(Math.abs(state.b), Math.abs(yValue(state.x))) / 2) * 2));
+      updateAll();
+      document.querySelector("#laboratorio").scrollIntoView({ behavior: "smooth", block: "start" });
+    });
+
+    comparisonButtons.addEventListener("click", event => {
+      const button = event.target.closest("button[data-kind]");
+      if (!button) return;
+      state.comparison = button.dataset.kind;
+      [...comparisonButtons.querySelectorAll("button")].forEach(item => item.setAttribute("aria-pressed", String(item === button)));
+      renderComparison();
+    });
+
+    document.querySelectorAll("[data-check]").forEach(button => {
+      button.addEventListener("click", () => checkAnswer(button.dataset.check));
+    });
+
+    predictionExperiment.addEventListener("change", renderPrediction);
+
+    predictionChoices.addEventListener("click", event => {
+      const button = event.target.closest("button[data-choice]");
+      if (!button) return;
+      selectedPrediction = button.dataset.choice;
+      [...predictionChoices.querySelectorAll("button")].forEach(item => item.setAttribute("aria-pressed", String(item === button)));
+    });
+
+    document.querySelector("#runPredictionBtn").addEventListener("click", () => {
+      const task = predictionTasks[predictionExperiment.value];
+      task.apply();
+      updateAll();
+      setStatus(els.predictionFeedback, "Orain begiratu grafikoa, taula eta irakurketak. Zure hipotesiarekin bat dator?", "ok");
+    });
+
+    document.querySelector("#checkPredictionBtn").addEventListener("click", () => {
+      const task = predictionTasks[predictionExperiment.value];
+      if (!selectedPrediction) {
+        setStatus(els.predictionFeedback, "Lehenik aukeratu hipotesi bat.", "no");
+        return;
+      }
+      if (els.predictionReason.value.trim().length < 12) {
+        setStatus(els.predictionFeedback, "Erantzuna osatzeko, idatzi zergatik pentsatzen duzun hori.", "no");
+        return;
+      }
+      if (selectedPrediction === task.correct) {
+        markCompleted("prediction");
+        setStatus(els.predictionFeedback, `Oso ondo. ${task.explanation}`, "ok");
+      } else {
+        setStatus(els.predictionFeedback, `Oraindik ez. ${task.explanation}`, "no");
+      }
+    });
+
+    mistakeChoices.addEventListener("click", event => {
+      const button = event.target.closest("button[data-choice]");
+      if (!button) return;
+      selectedMistake = button.dataset.choice;
+      [...mistakeChoices.querySelectorAll("button")].forEach(item => item.setAttribute("aria-pressed", String(item === button)));
+    });
+
+    document.querySelector("#checkMistakeBtn").addEventListener("click", () => {
+      const task = mistakeTasks[currentMistakeIndex];
+      if (!selectedMistake) {
+        setStatus(els.mistakeFeedback, "Aukeratu akats mota bat lehenik.", "no");
+        return;
+      }
+      if (els.mistakeCorrection.value.trim().length < 10) {
+        setStatus(els.mistakeFeedback, "Idatzi zuzenketa labur bat: zer esan beharko luke ikasleak?", "no");
+        return;
+      }
+      if (selectedMistake === task.correct) {
+        markCompleted("mistake");
+        setStatus(els.mistakeFeedback, `Zuzen. ${task.explanation}`, "ok");
+      } else {
+        setStatus(els.mistakeFeedback, `Ez guztiz. ${task.explanation}`, "no");
+      }
+    });
+
+    document.querySelector("#nextMistakeBtn").addEventListener("click", () => {
+      currentMistakeIndex = (currentMistakeIndex + 1) % mistakeTasks.length;
+      renderMistake();
+    });
+
+    document.querySelector("#checkDetectiveBtn").addEventListener("click", () => {
+      const challenge = detectiveChallenges[detectiveIndex];
+      const guessedM = Number(els.guessM.value);
+      const guessedB = Number(els.guessB.value);
+      if (![guessedM, guessedB].every(Number.isFinite)) {
+        setStatus(els.detectiveFeedback, "Sartu m eta b zenbakizko balioak.", "no");
+        return;
+      }
+      if (nearly(guessedM, challenge.m) && nearly(guessedB, challenge.b)) {
+        markCompleted("detective");
+        setStatus(els.detectiveFeedback, `Asmatuta: ${formulaText(challenge.m, challenge.b)}. y ardatzeko ebakidura ${formatNumber(challenge.b)} da eta malda ${formatNumber(challenge.m)}.`, "ok");
+      } else {
+        setStatus(els.detectiveFeedback, `Berrikusi bi pista: b = ${formatNumber(challenge.b)} da y ardatzeko ebakidura, eta malda puntu batetik hurrengora irakurtzen da.`, "no");
+      }
+    });
+
+    document.querySelector("#newDetectiveBtn").addEventListener("click", () => {
+      detectiveIndex = (detectiveIndex + 1) % detectiveChallenges.length;
+      els.guessM.value = "";
+      els.guessB.value = "";
+      renderDetectiveGraph();
+    });
+
+    [els.modelTitle, els.modelXName, els.modelYName, els.modelM, els.modelB, els.modelExampleX].forEach(input => {
+      input.addEventListener("input", renderModelStory);
+    });
+
+    document.querySelector("#applyModelBtn").addEventListener("click", () => {
+      const m = Number(els.modelM.value);
+      const b = Number(els.modelB.value);
+      const exampleX = Number(els.modelExampleX.value);
+      if (![m, b, exampleX].every(Number.isFinite)) {
+        setStatus(els.modelStory, "Ezin da laborategira eraman: m, b eta x zenbakiak izan behar dira.", "no");
+        return;
+      }
+      state.m = Math.max(-4, Math.min(4, m));
+      state.b = Math.max(-5, Math.min(5, b));
+      state.x = Math.max(-6, Math.min(6, exampleX));
+      state.zoom = Math.max(6, Math.min(10, Math.ceil(Math.max(Math.abs(state.b), Math.abs(yValue(state.x))) / 2) * 2));
+      updateAll();
+      renderModelStory();
+      markCompleted("model");
+      document.querySelector("#laboratorio").scrollIntoView({ behavior: "smooth", block: "start" });
+    });
+
+    document.querySelector("#copyModelBtn").addEventListener("click", async () => {
+      renderModelStory();
+      const text = els.modelStory.textContent;
+      try {
+        await navigator.clipboard.writeText(text);
+        setStatus(els.modelStory, `${text}\n\nAzalpena arbelean edo koadernoan itsasteko kopiatu da.`, "ok");
+      } catch {
+        setStatus(els.modelStory, `${text}\n\nKopiatzeko: hautatu testu hau eta kopiatu eskuz.`, "ok");
+      }
+    });
+
+    els.hideFormulaToggle.addEventListener("change", () => {
+      document.body.classList.toggle("hide-formulas", els.hideFormulaToggle.checked);
+    });
+
+    els.projectModeToggle.addEventListener("change", () => {
+      document.body.classList.toggle("project-mode", els.projectModeToggle.checked);
+    });
+
+    document.querySelector("#buildSummaryBtn").addEventListener("click", buildStudentSummary);
+    document.querySelector("#printBtn").addEventListener("click", () => window.print());
+
+    graph.addEventListener("pointerdown", event => {
+      const rect = graph.getBoundingClientRect();
+      const localX = ((event.clientX - rect.left) / rect.width) * plot.width;
+      const bounds = Number(state.zoom);
+      const scale = getScale(bounds, plot);
+      const graphWidth = plot.width - plot.left - plot.right;
+      const x = scale.xMin + ((localX - plot.left) / graphWidth) * (scale.xMax - scale.xMin);
+      state.x = Math.max(-6, Math.min(6, Math.round(x * 4) / 4));
+      updateAll();
+    });
+
+    updateAll();
+    renderPrediction();
+    renderMistake();
+    renderDetectiveGraph();
+    renderModelStory();
+  </script>
+</body>
+</html>
